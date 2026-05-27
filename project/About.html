@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Jay Arnold · About</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg: #080a0d;
+        --fg: #eef1f6;
+        --accent: #00f5d4;
+        --sans: "Geist", "Helvetica Neue", system-ui, sans-serif;
+        --mono: "Geist Mono", "JetBrains Mono", ui-monospace, monospace;
+        --t-fast: 180ms cubic-bezier(.2,.7,.2,1);
+        --t-med: 320ms cubic-bezier(.2,.7,.2,1);
+        --reveal-intensity: 1;
+      }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+        font-family: var(--sans);
+        color: var(--fg);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      ::selection {
+        background: var(--accent);
+        color: #0a0a0a;
+      }
+      a:hover { color: var(--accent); }
+    </style>
+
+    <script
+      src="https://unpkg.com/react@18.3.1/umd/react.development.js"
+      integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"
+      integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"
+      integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel" src="atoms.jsx"></script>
+    <script type="text/babel" src="tweaks-panel.jsx"></script>
+    <script type="text/babel" src="about.jsx"></script>
+
+    <script type="text/babel">
+      const { useEffect: useEffectRoot } = React;
+
+      const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+        "accent": "#00f5d4"
+      }/*EDITMODE-END*/;
+
+      const ACCENTS = ["#00f5d4", "#22d3ee", "#38bdf8", "#60a5fa"];
+
+      function Root() {
+        const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+        useEffectRoot(() => {
+          document.documentElement.style.setProperty("--accent", t.accent);
+        }, [t.accent]);
+        return (
+          <>
+            <About />
+            <TweaksPanel>
+              <TweakSection label="Theme" />
+              <TweakColor
+                label="Accent"
+                value={t.accent}
+                options={ACCENTS}
+                onChange={(v) => setTweak("accent", v)}
+              />
+            </TweaksPanel>
+          </>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<Root />);
+    </script>
+  </body>
+</html>

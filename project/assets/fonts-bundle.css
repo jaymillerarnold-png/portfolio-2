@@ -1,0 +1,28 @@
+/*
+ * Self-hosted Inter + Onest (variable TTFs) for the design-md pack — no Google Fonts CDN.
+ * Maintainers: replace files under assets/fonts/ when upgrading; keep OFL-*.txt with the binaries.
+ */
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('./assets/fonts/Inter-VariableFont_opsz,wght.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('./assets/fonts/Inter-Italic-VariableFont_opsz,wght.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Onest';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('./assets/fonts/Onest-VariableFont_wght.ttf') format('truetype');
+}

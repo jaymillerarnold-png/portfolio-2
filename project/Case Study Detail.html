@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Jay Arnold · Case Study</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&family=Manrope:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg: #080a0d;
+        --fg: #eef1f6;
+        --accent: #00f5d4;
+        --sans: "Geist", "Helvetica Neue", system-ui, sans-serif;
+        --mono: "Geist Mono", "JetBrains Mono", ui-monospace, monospace;
+        --t-fast: 180ms cubic-bezier(.2,.7,.2,1);
+        --t-med: 320ms cubic-bezier(.2,.7,.2,1);
+        --reveal-intensity: 1;
+      }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+        font-family: var(--sans);
+        color: var(--fg);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      ::selection {
+        background: var(--accent);
+        color: #0a0a0a;
+      }
+      a:hover { color: var(--accent); }
+    </style>
+
+    <script
+      src="https://unpkg.com/react@18.3.1/umd/react.development.js"
+      integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"
+      integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"
+      integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel" src="content.jsx"></script>
+    <script type="text/babel" src="atoms.jsx"></script>
+    <script type="text/babel" src="case-editorial.jsx"></script>
+    <script type="text/babel" src="case-modular.jsx"></script>
+    <script type="text/babel" src="case-typographic.jsx"></script>
+    <script type="text/babel" src="case-payments.jsx"></script>
+    <script type="text/babel" src="tweaks-panel.jsx"></script>
+
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+
+      const TWEAK_DEFAULTS_RAW = /*EDITMODE-BEGIN*/{
+        "accent": "#00f5d4",
+        "bgTone": "cool",
+        "typePair": "geist",
+        "heroVariant": "A",
+        "density": "compact",
+        "animationIntensity": 1.5,
+        "showcaseStudy": "collaborative"
+      }/*EDITMODE-END*/;
+
+      // Allow homepage links (Case Study Detail.html?study=<slug>) to deep-link
+      // into a specific case study. URL param wins over the persisted default.
+      const __urlStudy = new URLSearchParams(location.search).get("study");
+      const TWEAK_DEFAULTS = (__urlStudy && window.CASE_STUDIES && window.CASE_STUDIES[__urlStudy])
+        ? { ...TWEAK_DEFAULTS_RAW, showcaseStudy: __urlStudy }
+        : TWEAK_DEFAULTS_RAW;
+
+      const BG_TONES = {
+        true:  { bg: "#0a0a0a", fg: "#f4f4f4" },
+        warm:  { bg: "#0e0c08", fg: "#f6f1e6" },
+        cool:  { bg: "#080a0d", fg: "#eef1f6" },
+      };
+
+      const TYPE_PAIRS = {
+        geist:    { sans: '"Geist", "Helvetica Neue", system-ui, sans-serif',  mono: '"Geist Mono", ui-monospace, monospace' },
+        manrope:  { sans: '"Manrope", "Helvetica Neue", system-ui, sans-serif', mono: '"Space Mono", ui-monospace, monospace' },
+        dmsans:   { sans: '"DM Sans", "Helvetica Neue", system-ui, sans-serif', mono: '"JetBrains Mono", ui-monospace, monospace' },
+        serif:    { sans: '"Instrument Serif", Georgia, serif',                 mono: '"Geist Mono", ui-monospace, monospace' },
+      };
+
+      const ACCENTS = ["#00f5d4", "#22d3ee", "#38bdf8", "#60a5fa"];
+
+      function App() {
+        const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+        const [mode, setMode] = useState("full");
+
+        const tone = BG_TONES[t.bgTone] || BG_TONES.true;
+        const pair = TYPE_PAIRS[t.typePair] || TYPE_PAIRS.geist;
+        const study = window.CASE_STUDIES[t.showcaseStudy] || window.CASE_STUDIES.collaborative;
+        const all = window.CASE_STUDIES;
+
+        // Apply css vars to :root so the live page picks them up.
+        useEffect(() => {
+          const r = document.documentElement.style;
+          r.setProperty("--bg", tone.bg);
+          r.setProperty("--fg", tone.fg);
+          r.setProperty("--accent", t.accent);
+          r.setProperty("--sans", pair.sans);
+          r.setProperty("--mono", pair.mono);
+          r.setProperty("--reveal-intensity", String(t.animationIntensity));
+        }, [t.accent, t.bgTone, t.typePair, t.animationIntensity, tone.bg, tone.fg, pair.sans, pair.mono]);
+
+        return (
+          <>
+            {study.layout === "payments" ? (
+              <window.CasePayments
+                study={study}
+                all={all}
+                mode={mode}
+                setMode={setMode}
+                density={t.density}
+                heroVariant={t.heroVariant}
+              />
+            ) : (
+              <window.CaseEditorial
+                study={study}
+                all={all}
+                mode={mode}
+                setMode={setMode}
+                density={t.density}
+                heroVariant={t.heroVariant}
+              />
+            )}
+
+            <TweaksPanel>
+              <TweakSection label="Content" />
+              <TweakSelect
+                label="Case study"
+                value={t.showcaseStudy}
+                options={[
+                  { value: "collaborative", label: "Collaborative Ordering" },
+                  { value: "compliance", label: "Compliance Requirements" },
+                  { value: "genui", label: "GenUI Component System" },
+                  { value: "money", label: "Payment Improvements" },
+                ]}
+                onChange={(v) => setTweak("showcaseStudy", v)}
+              />
+
+              <TweakSection label="Theme" />
+              <TweakColor
+                label="Accent"
+                value={t.accent}
+                options={ACCENTS}
+                onChange={(v) => setTweak("accent", v)}
+              />
+              <TweakRadio
+                label="Background"
+                value={t.bgTone}
+                options={["true", "warm", "cool"]}
+                onChange={(v) => setTweak("bgTone", v)}
+              />
+              <TweakSelect
+                label="Type pair"
+                value={t.typePair}
+                options={[
+                  { value: "geist", label: "Geist + Geist Mono" },
+                  { value: "manrope", label: "Manrope + Space Mono" },
+                  { value: "dmsans", label: "DM Sans + JetBrains Mono" },
+                  { value: "serif", label: "Instrument Serif + Geist Mono" },
+                ]}
+                onChange={(v) => setTweak("typePair", v)}
+              />
+
+              <TweakSection label="Layout" />
+              <TweakRadio
+                label="Hero variant"
+                value={t.heroVariant}
+                options={["A", "B", "C"]}
+                onChange={(v) => setTweak("heroVariant", v)}
+              />
+              <TweakRadio
+                label="Density"
+                value={t.density}
+                options={["compact", "comfortable", "spacious"]}
+                onChange={(v) => setTweak("density", v)}
+              />
+
+              <TweakSection label="Motion" />
+              <TweakSlider
+                label="Animation"
+                value={t.animationIntensity}
+                min={0}
+                max={1.5}
+                step={0.1}
+                onChange={(v) => setTweak("animationIntensity", v)}
+              />
+            </TweaksPanel>
+          </>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

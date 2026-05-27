@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Jay Arnold · Product Designer</title>
+
+    <!-- Code-referenced assets (lifted from content.jsx so the bundler can find them) -->
+    <meta name="ext-resource-dependency" content="images/collaborative-cover.png" data-resource-id="coverCollaborative" />
+    <meta name="ext-resource-dependency" content="images/compliance-cover.png"    data-resource-id="coverCompliance" />
+    <meta name="ext-resource-dependency" content="images/genui-cover.png"         data-resource-id="coverGenui" />
+    <meta name="ext-resource-dependency" content="images/money-wizard-after.png"  data-resource-id="coverMoney" />
+
+    <template id="__bundler_thumbnail" data-bg-color="#080a0d">
+      <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+        <rect width="1200" height="800" fill="#080a0d" />
+        <text x="600" y="430" text-anchor="middle"
+              font-family="Helvetica, Arial, sans-serif"
+              font-size="220" font-weight="500"
+              letter-spacing="-12" fill="#00f5d4">JA</text>
+        <circle cx="820" cy="365" r="14" fill="#00f5d4" />
+      </svg>
+    </template>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg: #080a0d;
+        --fg: #eef1f6;
+        --accent: #00f5d4;
+        --sans: "Geist", "Helvetica Neue", system-ui, sans-serif;
+        --mono: "Geist Mono", "JetBrains Mono", ui-monospace, monospace;
+        --t-fast: 180ms cubic-bezier(.2,.7,.2,1);
+        --t-med: 320ms cubic-bezier(.2,.7,.2,1);
+        --reveal-intensity: 1;
+      }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+        font-family: var(--sans);
+        color: var(--fg);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      ::selection {
+        background: var(--accent);
+        color: #0a0a0a;
+      }
+      a:hover { color: var(--accent); }
+    </style>
+
+    <script
+      src="https://unpkg.com/react@18.3.1/umd/react.development.js"
+      integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"
+      integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"
+      integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script>
+      /* Standalone-build shim: maps bare "images/foo.png" srcs in the rendered
+         DOM to the blob URLs the bundler stashes on window.__resources. Runs as
+         plain JS (no Babel) so it's live before any React tree mounts. */
+      (function () {
+        const map = {};
+        document.querySelectorAll('meta[name="ext-resource-dependency"]').forEach(function (m) {
+          const path = m.getAttribute('content');
+          const id   = m.getAttribute('data-resource-id');
+          if (path && id) map[path] = id;
+        });
+        function resolve(path) {
+          const id = map[path];
+          if (id && window.__resources && window.__resources[id]) {
+            return window.__resources[id];
+          }
+          return path;
+        }
+        function patch(img) {
+          const s = img.getAttribute('src');
+          if (s && map[s]) {
+            const blob = resolve(s);
+            if (blob !== s) img.src = blob;
+          }
+        }
+        function scan(root) {
+          if (!root) return;
+          if (root.tagName === 'IMG') patch(root);
+          if (root.querySelectorAll) root.querySelectorAll('img').forEach(patch);
+        }
+        window.__asset = resolve;
+        document.addEventListener('DOMContentLoaded', function () {
+          scan(document.body);
+          new MutationObserver(function (muts) {
+            muts.forEach(function (m) {
+              m.addedNodes && m.addedNodes.forEach(scan);
+              if (m.type === 'attributes' && m.target.tagName === 'IMG') patch(m.target);
+            });
+          }).observe(document.body, {
+            childList: true, subtree: true,
+            attributes: true, attributeFilter: ['src'],
+          });
+        });
+      })();
+    </script>
+
+    <script type="text/babel" src="content.jsx"></script>
+    <script type="text/babel" src="atoms.jsx"></script>
+    <script type="text/babel" src="tweaks-panel.jsx"></script>
+    <script type="text/babel" src="homepage.jsx"></script>
+
+    <script type="text/babel">
+      const { useEffect: useEffectRoot } = React;
+
+      const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+        "accent": "#00f5d4",
+        "heroVariant": "A",
+        "density": "compact"
+      }/*EDITMODE-END*/;
+
+      const ACCENTS = ["#00f5d4", "#22d3ee", "#38bdf8", "#60a5fa"];
+
+      function Root() {
+        const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+        useEffectRoot(() => {
+          document.documentElement.style.setProperty("--accent", t.accent);
+        }, [t.accent]);
+        return (
+          <>
+            <Homepage />
+            <TweaksPanel>
+              <TweakSection label="Theme" />
+              <TweakColor
+                label="Accent"
+                value={t.accent}
+                options={ACCENTS}
+                onChange={(v) => setTweak("accent", v)}
+              />
+            </TweaksPanel>
+          </>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<Root />);
+    </script>
+  </body>
+</html>
