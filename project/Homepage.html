@@ -59,45 +59,845 @@
   <body>
     <div id="root"></div>
 
-    <script type="text/babel" src="content.jsx"></script>
-    <script type="text/babel" src="atoms.jsx"></script>
-    <script type="text/babel" src="tweaks-panel.jsx"></script>
-    <script type="text/babel" src="homepage.jsx"></script>
-
     <script type="text/babel">
-      const { useEffect: useEffectRoot } = React;
+      const { useEffect, useRef, useState } = React;
 
-      const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
-        "accent": "#00f5d4",
-        "heroVariant": "A",
-        "density": "compact"
-      }/*EDITMODE-END*/;
+      /* ───────────────────────────────────────────────────────────────────
+         Reveal — fades + translates in on intersection
+         ─────────────────────────────────────────────────────────────────── */
+      function Reveal({ children, delay = 0, y = 16 }) {
+        const ref = useRef(null);
+        const [shown, setShown] = useState(false);
+        useEffect(() => {
+          const el = ref.current;
+          if (!el) return;
+          const obs = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((e) => {
+                if (e.isIntersecting) { setShown(true); obs.unobserve(el); }
+              });
+            },
+            { threshold: 0.12, rootMargin: "0px 0px -8% 0px" }
+          );
+          obs.observe(el);
+          return () => obs.disconnect();
+        }, []);
+        return (
+          <div
+            ref={ref}
+            style={{
+              opacity: shown ? 1 : 0,
+              transform: shown ? "translateY(0)" : `translateY(${y}px)`,
+              transition: `opacity 700ms cubic-bezier(.2,.7,.2,1) ${delay}ms, transform 700ms cubic-bezier(.2,.7,.2,1) ${delay}ms`,
+            }}
+          >
+            {children}
+          </div>
+        );
+      }
 
-      const ACCENTS = ["#00f5d4", "#22d3ee", "#38bdf8", "#60a5fa"];
+      /* ───────────────────────────────────────────────────────────────────
+         Eyebrow — monospace label, optionally accent-colored
+         ─────────────────────────────────────────────────────────────────── */
+      function Eyebrow({ children, accent }) {
+        return (
+          <div
+            style={{
+              fontFamily: "var(--mono)",
+              fontSize: 11,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: accent ? "var(--accent)" : "rgba(255,255,255,0.45)",
+            }}
+          >
+            {children}
+          </div>
+        );
+      }
 
-      function Root() {
-        const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
-        useEffectRoot(() => {
-          document.documentElement.style.setProperty("--accent", t.accent);
-        }, [t.accent]);
+      /* ───────────────────────────────────────────────────────────────────
+         Placeholder — striped SVG stand-in or real image
+         ─────────────────────────────────────────────────────────────────── */
+      function Placeholder({ label, aspect = "16/9", style, hint, src }) {
+        if (src) {
+          return (
+            <div
+              style={{
+                aspectRatio: aspect,
+                width: "100%",
+                position: "relative",
+                background: "rgba(255,255,255,0.02)",
+                border: "1px solid rgba(255,255,255,0.06)",
+                borderRadius: 4,
+                overflow: "hidden",
+                ...style,
+              }}
+            >
+              <img
+                src={src}
+                alt={label || ""}
+                loading="lazy"
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  objectPosition: "center top",
+                  display: "block",
+                }}
+              />
+            </div>
+          );
+        }
+        const stripe = "rgba(255,255,255,0.025)";
+        const stripeAlt = "rgba(255,255,255,0.012)";
+        return (
+          <div
+            style={{
+              aspectRatio: aspect,
+              width: "100%",
+              position: "relative",
+              background: `repeating-linear-gradient(135deg, ${stripe} 0 1px, ${stripeAlt} 1px 9px)`,
+              border: "1px solid rgba(255,255,255,0.06)",
+              borderRadius: 4,
+              overflow: "hidden",
+              ...style,
+            }}
+          >
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                padding: "14px 16px",
+                fontFamily: "var(--mono)",
+                fontSize: 10,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                color: "rgba(255,255,255,0.45)",
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                  <span
+                    style={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: 999,
+                      background: "var(--accent)",
+                      boxShadow: "0 0 8px var(--accent)",
+                    }}
+                  />
+                  placeholder
+                </span>
+                <span style={{ opacity: 0.6 }}>{aspect}</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "flex-end" }}>
+                {hint && <div style={{ opacity: 0.55 }}>{hint}</div>}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      /* ───────────────────────────────────────────────────────────────────
+         ContactLinks — Email / Resume / LinkedIn
+         ─────────────────────────────────────────────────────────────────── */
+      function ContactLinks() {
+        const items = [
+          ["Email", "mailto:jaymillerarnold@gmail.com", {}],
+          ["Resume", "Jay_Arnold_Resume.pdf", { download: true }],
+          ["LinkedIn", "https://www.linkedin.com/in/jay-m-arnold/", { external: true }],
+        ];
+        return (
+          <div
+            style={{
+              display: "flex",
+              gap: 28,
+              flexWrap: "wrap",
+              fontFamily: "var(--mono)",
+              fontSize: 11,
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+              color: "rgba(255,255,255,0.55)",
+            }}
+          >
+            {items.map(([label, href, opts]) => (
+              <a
+                key={label}
+                href={href}
+                {...(opts.download ? { download: "" } : {})}
+                {...(opts.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                style={{ color: "inherit", textDecoration: "none" }}
+              >
+                {label} ↗
+              </a>
+            ))}
+          </div>
+        );
+      }
+
+      /* ───────────────────────────────────────────────────────────────────
+         SiteFooter — shared footer across all pages
+         ─────────────────────────────────────────────────────────────────── */
+      function SiteFooter({ maxWidth = 1400 }) {
+        return (
+          <footer
+            style={{
+              maxWidth,
+              margin: "0 auto",
+              padding: "32px 32px 48px",
+              borderTop: "1px solid rgba(255,255,255,0.08)",
+              display: "flex",
+              flexDirection: "column",
+              gap: 16,
+            }}
+          >
+            <div
+              style={{
+                marginTop: 40,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: 24,
+                flexWrap: "wrap",
+                fontFamily: "var(--mono)",
+                fontSize: 11,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "rgba(255,255,255,0.55)",
+              }}
+            >
+              <span>© 2026 Jay Arnold · Durango, CO</span>
+              <ContactLinks />
+            </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: 24,
+                flexWrap: "wrap",
+                fontFamily: "var(--mono)",
+                fontSize: 10,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: "rgba(255,255,255,0.32)",
+              }}
+            >
+              <span>Geist + Geist Mono</span>
+              <span>Designed in Figma · Built in Claude Code</span>
+            </div>
+          </footer>
+        );
+      }
+
+      /* ───────────────────────────────────────────────────────────────────
+         PortfolioChrome — sticky top nav
+         ─────────────────────────────────────────────────────────────────── */
+      function PortfolioChrome({ current }) {
+        return (
+          <header
+            style={{
+              position: "sticky",
+              top: 0,
+              zIndex: 50,
+              background: "color-mix(in oklab, var(--bg) 80%, transparent)",
+              backdropFilter: "blur(12px)",
+              borderBottom: "1px solid rgba(255,255,255,0.06)",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "14px 32px",
+                fontFamily: "var(--mono)",
+                fontSize: 11,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
+                <a
+                  href="Homepage.html"
+                  style={{
+                    color: "var(--fg)",
+                    textDecoration: "none",
+                    fontWeight: 600,
+                    fontFamily: '"Geist", "Helvetica Neue", system-ui, sans-serif',
+                    fontSize: 14,
+                    letterSpacing: "-0.01em",
+                    textTransform: "none",
+                  }}
+                >
+                  Jay Arnold
+                </a>
+                <nav
+                  style={{
+                    display: "flex",
+                    gap: 22,
+                    color: "rgba(255,255,255,0.55)",
+                    fontFamily: '"Geist", "Helvetica Neue", system-ui, sans-serif',
+                    fontSize: 14,
+                    letterSpacing: "-0.01em",
+                    textTransform: "none",
+                  }}
+                >
+                  <a
+                    href="Homepage.html"
+                    style={{
+                      color: current === "work" ? "var(--fg)" : "inherit",
+                      textDecoration: "none",
+                      fontWeight: current === "work" ? 500 : 400,
+                    }}
+                  >
+                    Work
+                  </a>
+                  <a
+                    href="About.html"
+                    style={{
+                      color: current === "about" ? "var(--fg)" : "inherit",
+                      textDecoration: "none",
+                      fontWeight: current === "about" ? 500 : 400,
+                    }}
+                  >
+                    About
+                  </a>
+                </nav>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--accent)" }}>
+                <span
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: 999,
+                    background: "var(--accent)",
+                    boxShadow: "0 0 8px var(--accent)",
+                  }}
+                />
+                Available for work
+              </div>
+            </div>
+          </header>
+        );
+      }
+
+      /* ───────────────────────────────────────────────────────────────────
+         Case study content
+         ─────────────────────────────────────────────────────────────────── */
+      const CASE_STUDIES = {
+        collaborative: {
+          slug: "collaborative",
+          title: "Collaborative Ordering & Fulfillment",
+          subtitle: "",
+          cover: "images/collaborative-cover.png",
+          role: "Lead Product Designer · Lead Researcher",
+          year: "2024 — 2025",
+          metrics: [
+            { value: "94%", label: "Task success", note: "across 13 validated tasks" },
+            { value: "100%", label: "Said it improved", note: "in follow-up usability" },
+            { value: "<50→94%", label: "Lift from V1", note: "some tasks went 0 → 94%" },
+            { value: "15", label: "Participants", note: "across 14 companies" },
+          ],
+        },
+        compliance: {
+          slug: "compliance",
+          title: "Compliance Requirements",
+          subtitle: "Bringing insurance compliance into the payments flow for construction finance.",
+          cover: "images/compliance-cover.png",
+          role: "Lead Product Designer · Lead Researcher",
+          year: "2023 — 2024",
+          metrics: [
+            { value: "−50%", label: "Time to payment", note: "55 days → 27 days" },
+            { value: "$290M", label: "Processed", note: "in 18 months post-launch" },
+            { value: "200+", label: "Organizations", note: "using the platform" },
+            { value: "3", label: "Customers retained", note: "previously at risk of churn" },
+          ],
+        },
+        genui: {
+          slug: "genui",
+          title: "GenUI Component System",
+          subtitle: "A dynamic component set so the AI assistant can render the right format for the question.",
+          cover: "images/genui-cover.png",
+          role: "Lead Product Designer",
+          year: "2026",
+          metrics: [
+            { value: "14", label: "Components", note: "designed in Figma" },
+            { value: "~40%", label: "Built & promoted", note: "to the design system" },
+            { value: "2", label: "Teams validated", note: "lender + data" },
+            { value: "1", label: "Agent response shell", note: "shared container pattern" },
+          ],
+        },
+        money: {
+          slug: "money",
+          title: "Payment Improvements",
+          subtitle: "Two focused UX improvements that take work off the user and put it on the software.",
+          cover: "images/money-wizard-after.png",
+          role: "Lead Product Designer",
+          year: "2023 — 2025",
+          improvements: [
+            { name: "Payment Tracker" },
+            { name: "Wizard to Drawer" },
+          ],
+          metrics: [
+            { value: "4 → 2", label: "Clicks to send payment", note: "wizard → drawer" },
+            { value: "2", label: "Friction wins", note: "shipped under one banner" },
+          ],
+        },
+      };
+
+      /* ───────────────────────────────────────────────────────────────────
+         HomeHero
+         ─────────────────────────────────────────────────────────────────── */
+      function HomeHero() {
+        return (
+          <section
+            style={{
+              padding: "120px 32px 80px",
+              maxWidth: 1400,
+              margin: "0 auto",
+            }}
+          >
+            <Eyebrow>Lead Product Designer</Eyebrow>
+
+            <Reveal>
+              <h1
+                style={{
+                  margin: "56px 0 0",
+                  fontSize: "clamp(64px, 9.5vw, 144px)",
+                  lineHeight: 0.98,
+                  letterSpacing: "-0.04em",
+                  fontWeight: 500,
+                  maxWidth: "14ch",
+                  textWrap: "balance",
+                }}
+              >
+                Design that moves{" "}
+                <em
+                  style={{
+                    color: "var(--accent)",
+                    fontStyle: "italic",
+                    fontWeight: 500,
+                  }}
+                >
+                  product
+                </em>{" "}
+                forward.
+              </h1>
+            </Reveal>
+
+            <Reveal delay={120}>
+              <p
+                style={{
+                  margin: "72px 0 0",
+                  fontSize: 22,
+                  lineHeight: 1.45,
+                  letterSpacing: "-0.005em",
+                  color: "rgba(255,255,255,0.55)",
+                  maxWidth: "44ch",
+                  textWrap: "pretty",
+                  fontWeight: 400,
+                }}
+              >
+                I lead design on complex, 0-to-1 product problems. User research
+                and systems thinking through to shipped experiences.
+              </p>
+            </Reveal>
+
+            <Reveal delay={240}>
+              <div
+                style={{
+                  marginTop: 120,
+                  paddingTop: 28,
+                  borderTop: "1px solid rgba(255,255,255,0.08)",
+                  display: "grid",
+                  gridTemplateColumns: "repeat(4, 1fr)",
+                  gap: 32,
+                }}
+              >
+                {[
+                  ["0 → 1", "Specialty"],
+                  ["Research-led", "Approach"],
+                  ["Fintech / CRE", "Domain"],
+                  ["Durango, CO", "Based"],
+                ].map(([value, label], i) => (
+                  <div
+                    key={i}
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 14,
+                      paddingLeft: i === 0 ? 0 : 24,
+                      borderLeft: i === 0 ? "none" : "1px solid rgba(255,255,255,0.06)",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontFamily: "var(--mono)",
+                        fontSize: 11,
+                        letterSpacing: "0.12em",
+                        textTransform: "uppercase",
+                        color: "rgba(255,255,255,0.4)",
+                      }}
+                    >
+                      {label}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 22,
+                        lineHeight: 1.15,
+                        letterSpacing: "-0.015em",
+                        fontWeight: 500,
+                        color: "var(--fg)",
+                        fontFeatureSettings: '"tnum" 1, "ss01" 1',
+                      }}
+                    >
+                      {value}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Reveal>
+          </section>
+        );
+      }
+
+      /* ───────────────────────────────────────────────────────────────────
+         CaseStudyCard — full-width editorial row
+         ─────────────────────────────────────────────────────────────────── */
+      function CaseStudyCard({ index, study, accentMetricIndex }) {
+        const [hover, setHover] = useState(false);
+        return (
+          <a
+            href={`Case Study Detail.html?study=${study.slug}`}
+            onMouseEnter={() => setHover(true)}
+            onMouseLeave={() => setHover(false)}
+            style={{
+              display: "block",
+              textDecoration: "none",
+              color: "inherit",
+              padding: "44px 32px",
+              borderTop: "1px solid rgba(255,255,255,0.08)",
+              transition: "background var(--t-med)",
+              background: hover ? "rgba(255,255,255,0.015)" : "transparent",
+            }}
+          >
+            <div
+              style={{
+                maxWidth: 1400,
+                margin: "0 auto",
+                display: "grid",
+                gridTemplateColumns: "72px 1.2fr 1.4fr 32px",
+                gap: 48,
+                alignItems: "start",
+              }}
+            >
+              {/* Index */}
+              <div
+                style={{
+                  fontFamily: "var(--mono)",
+                  fontSize: 12,
+                  letterSpacing: "0.1em",
+                  color: hover ? "var(--accent)" : "rgba(255,255,255,0.5)",
+                  paddingTop: 8,
+                  transition: "color var(--t-fast)",
+                }}
+              >
+                {String(index).padStart(2, "0")}
+              </div>
+
+              {/* Title + subtitle + year */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                <h2
+                  style={{
+                    margin: 0,
+                    fontSize: "clamp(28px, 3.4vw, 44px)",
+                    lineHeight: 1.04,
+                    letterSpacing: "-0.025em",
+                    fontWeight: 500,
+                    maxWidth: "18ch",
+                    textWrap: "pretty",
+                    color: hover ? "var(--fg)" : "rgba(255,255,255,0.92)",
+                    transition: "color var(--t-fast)",
+                  }}
+                >
+                  {study.title}
+                </h2>
+                {study.subtitle && (
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: 15,
+                      lineHeight: 1.5,
+                      color: "rgba(255,255,255,0.55)",
+                      maxWidth: "44ch",
+                      textWrap: "pretty",
+                    }}
+                  >
+                    {study.subtitle}
+                  </p>
+                )}
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 4 }}>
+                  <span
+                    style={{
+                      fontFamily: "var(--mono)",
+                      fontSize: 10,
+                      letterSpacing: "0.08em",
+                      textTransform: "uppercase",
+                      color: "rgba(255,255,255,0.35)",
+                      padding: "4px 8px",
+                      border: "1px solid rgba(255,255,255,0.08)",
+                      borderRadius: 999,
+                      display: "inline-flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    {study.year}
+                  </span>
+                </div>
+              </div>
+
+              {/* Visual + headline metric */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+                <Placeholder
+                  label={
+                    (study.improvements && study.improvements[0] && study.improvements[0].name) ||
+                    study.title
+                  }
+                  src={study.cover}
+                  aspect="16/9"
+                  hint={study.role}
+                  style={{
+                    background: hover
+                      ? "repeating-linear-gradient(135deg, rgba(0,245,212,0.03) 0 1px, rgba(255,255,255,0.012) 1px 9px)"
+                      : undefined,
+                    borderColor: hover ? "rgba(0,245,212,0.18)" : "rgba(255,255,255,0.06)",
+                    transition: "border-color var(--t-fast), background var(--t-fast)",
+                  }}
+                />
+                {study.metrics && study.metrics[accentMetricIndex] && (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "baseline",
+                      gap: 12,
+                      paddingTop: 4,
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: 28,
+                        letterSpacing: "-0.025em",
+                        fontWeight: 500,
+                        color: "var(--accent)",
+                        fontFeatureSettings: '"tnum" 1, "ss01" 1',
+                      }}
+                    >
+                      {study.metrics[accentMetricIndex].value}
+                    </span>
+                    <span
+                      style={{
+                        fontFamily: "var(--mono)",
+                        fontSize: 10,
+                        letterSpacing: "0.1em",
+                        textTransform: "uppercase",
+                        color: "rgba(255,255,255,0.55)",
+                      }}
+                    >
+                      {study.metrics[accentMetricIndex].label}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Arrow */}
+              <div
+                style={{
+                  fontFamily: "var(--mono)",
+                  color: hover ? "var(--accent)" : "rgba(255,255,255,0.5)",
+                  fontSize: 22,
+                  paddingTop: 6,
+                  transform: hover ? "translateX(8px)" : "translateX(0)",
+                  transition: "transform var(--t-med), color var(--t-fast)",
+                  justifySelf: "end",
+                }}
+              >
+                →
+              </div>
+            </div>
+          </a>
+        );
+      }
+
+      /* ───────────────────────────────────────────────────────────────────
+         HomeWork — 4 case study rows
+         ─────────────────────────────────────────────────────────────────── */
+      function HomeWork() {
+        const order = ["collaborative", "compliance", "genui", "money"];
+        const featureMetric = {
+          collaborative: 0,
+          compliance: 1,
+          genui: 0,
+          money: 0,
+        };
+        return (
+          <section id="work" style={{ marginTop: 32, scrollMarginTop: 64 }}>
+            <div
+              style={{
+                maxWidth: 1400,
+                margin: "0 auto",
+                padding: "0 32px 24px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "baseline",
+              }}
+            >
+              <Eyebrow accent>Work</Eyebrow>
+              <span
+                style={{
+                  fontFamily: "var(--mono)",
+                  fontSize: 11,
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  color: "rgba(255,255,255,0.4)",
+                }}
+              >
+                4 case studies · 2023 — 2026
+              </span>
+            </div>
+
+            {order.map((slug, i) => (
+              <Reveal key={slug} delay={i * 60}>
+                <CaseStudyCard
+                  index={i + 1}
+                  study={CASE_STUDIES[slug]}
+                  accentMetricIndex={featureMetric[slug]}
+                />
+              </Reveal>
+            ))}
+
+            <div
+              style={{
+                maxWidth: 1400,
+                margin: "0 auto",
+                padding: "0 32px",
+                borderTop: "1px solid rgba(255,255,255,0.08)",
+              }}
+            />
+          </section>
+        );
+      }
+
+      /* ───────────────────────────────────────────────────────────────────
+         HomeFooter — About teaser + site footer
+         ─────────────────────────────────────────────────────────────────── */
+      function HomeFooter() {
+        const [hover, setHover] = useState(false);
         return (
           <>
-            <Homepage />
-            <TweaksPanel>
-              <TweakSection label="Theme" />
-              <TweakColor
-                label="Accent"
-                value={t.accent}
-                options={ACCENTS}
-                onChange={(v) => setTweak("accent", v)}
-              />
-            </TweaksPanel>
+            <section
+              style={{
+                marginTop: 120,
+                padding: "120px 32px 0",
+                maxWidth: 1400,
+                marginInline: "auto",
+              }}
+            >
+              <Reveal>
+                <a
+                  href="About.html"
+                  onMouseEnter={() => setHover(true)}
+                  onMouseLeave={() => setHover(false)}
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1.4fr 1fr",
+                    gap: 80,
+                    alignItems: "end",
+                    textDecoration: "none",
+                    color: "inherit",
+                    paddingBottom: 48,
+                  }}
+                >
+                  <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
+                    <Eyebrow accent>About</Eyebrow>
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: "clamp(28px, 3.4vw, 44px)",
+                        lineHeight: 1.15,
+                        letterSpacing: "-0.025em",
+                        fontWeight: 400,
+                        color: "rgba(255,255,255,0.92)",
+                        maxWidth: "22ch",
+                        textWrap: "pretty",
+                      }}
+                    >
+                      Lead product designer focused on 0&nbsp;→&nbsp;1 work. Turning
+                      ambiguous problems into experiences that hold up with real
+                      users.
+                    </p>
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "flex-end",
+                      gap: 12,
+                      fontFamily: "var(--mono)",
+                      fontSize: 12,
+                      letterSpacing: "0.08em",
+                      textTransform: "uppercase",
+                      color: "var(--accent)",
+                    }}
+                  >
+                    <span>More about me</span>
+                    <span
+                      style={{
+                        fontSize: 18,
+                        transition: "transform var(--t-med)",
+                        display: "inline-block",
+                        transform: hover ? "translateX(10px)" : "translateX(0)",
+                      }}
+                    >
+                      →
+                    </span>
+                  </div>
+                </a>
+              </Reveal>
+            </section>
+            <SiteFooter maxWidth={1400} />
           </>
         );
       }
 
+      /* ───────────────────────────────────────────────────────────────────
+         Homepage root
+         ─────────────────────────────────────────────────────────────────── */
+      function Homepage() {
+        return (
+          <main
+            style={{
+              background: "var(--bg)",
+              color: "var(--fg)",
+              fontFamily: "var(--sans)",
+              minHeight: "100vh",
+            }}
+          >
+            <PortfolioChrome current="work" />
+            <HomeHero />
+            <HomeWork />
+            <HomeFooter />
+          </main>
+        );
+      }
+
       const root = ReactDOM.createRoot(document.getElementById("root"));
-      root.render(<Root />);
+      root.render(<Homepage />);
     </script>
   </body>
 </html>
