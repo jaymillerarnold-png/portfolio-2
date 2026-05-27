@@ -1,0 +1,1766 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Jay Arnold · Case Study</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg: #080a0d;
+        --fg: #eef1f6;
+        --accent: #00f5d4;
+        --sans: "Geist", "Helvetica Neue", system-ui, sans-serif;
+        --mono: "Geist Mono", "JetBrains Mono", ui-monospace, monospace;
+        --t-fast: 180ms cubic-bezier(.2,.7,.2,1);
+        --t-med: 320ms cubic-bezier(.2,.7,.2,1);
+      }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+        font-family: var(--sans);
+        color: var(--fg);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      ::selection {
+        background: var(--accent);
+        color: #0a0a0a;
+      }
+      a { transition: color var(--t-fast); }
+      a:hover { color: var(--accent); }
+    </style>
+
+    <script
+      src="https://unpkg.com/react@18.3.1/umd/react.development.js"
+      integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"
+      integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"
+      integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect, useRef } = React;
+
+      /* ═══════════════════════════════════════════════════════════════════════
+         CONTENT DATA
+         ═══════════════════════════════════════════════════════════════════════ */
+      const CASE_STUDIES = {
+        collaborative: {
+          slug: "collaborative",
+          title: "Collaborative Ordering & Fulfillment",
+          subtitle: "",
+          cover: "images/collaborative-cover.png",
+          researchImage: "images/collaborative-research.png",
+          tags: ["RESEARCH", "B2B"],
+          role: "Lead Product Designer · Lead Researcher",
+          team: "PM · EM · 6 Engineers · Customer Success · Sales",
+          year: "2024 — 2025",
+          headers: {
+            context: "The Problem",
+            research: "Turning Research into a Business Case",
+            researchNav: "Research",
+            process: "The Process",
+            screens: "What We Built",
+            outcomes: "Outcomes",
+          },
+          metrics: [
+            { value: "94%", label: "Task success", note: "across 13 validated tasks" },
+            { value: "100%", label: "Said it improved", note: "in follow-up usability" },
+            { value: "<50→94%", label: "Lift from V1", note: "some tasks went 0 → 94%" },
+            { value: "15", label: "Participants", note: "across 14 companies" },
+          ],
+          context: "When I joined the team, a new ordering and fulfillment feature was already deep in development, nearly ready to ship. My first move was to get it in front of real users.",
+          contextLong: "When I joined the team, a new ordering and fulfillment feature was already deep in development, nearly ready to ship. My first move was to get it in front of real users.\n\nResults were rough. In usability sessions with buyers, over 80% failed on the order template builder and 100% failed on the core order page. Vendors weren't doing any better. 100% failed on the order page, and over 50% struggled with fulfillment. A few said the workflow would double their workload.\n\nIf buyers and vendors couldn't coordinate inspection orders inside the platform, they'd just go around it. Back to email threads, spreadsheets, or competitors like RIMS. We needed a case for a full redesign before anything shipped.",
+          research: [
+            { label: "Participants in V1 study", value: "15" },
+            { label: "Inspection companies", value: "14" },
+            { label: "Validated tasks in V2", value: "13" },
+            { label: "V1 buyer failure rate", value: "80%+" },
+          ],
+          researchNarrative: "I led synthesis of the usability findings and brought them to leadership across product, sales, and customer success. This was a revenue and retention risk as much as a design one. Getting buy-in meant connecting the UX failures directly to churn and competitive displacement. We got the green light to start over.",
+          process: [
+            { phase: "Audit", title: "Map the current implementation", body: "Full review of what was already built to understand the workflow, the data model, and where things broke down." },
+            { phase: "Research", title: "Usability sessions with 15 participants", body: "Structured sessions across 14 inspection companies. Three things kept showing up: people couldn't find key information, the fulfillment path was unclear, and file uploads kept breaking." },
+            { phase: "Modular design", title: "Skip lo-fi, ship in chunks", body: "With limited runway we moved straight to mid- and high-fidelity. Each section was designed, tested, and validated independently so engineering never had to wait on the full system." },
+            { phase: "Rolling handoff", title: "Validate, hand off, repeat", body: "Validated sections handed to engineering while design continued on the next chunk. The rhythm continued until every section was shipped." },
+          ],
+          screens: [
+            { label: "Order template builder", aspect: "3/2", src: "images/collaborative-screen-01.png", caption: "Lenders compose a custom intake form per inspection type. Library on the right, live form in the center, drag to reorder." },
+            { label: "Orders table", aspect: "16/10", src: "images/collaborative-screen-02.png", caption: "Every order from request through fulfillment in one view. Status, vendor, due date, and completion at a glance." },
+            { label: "Vendor fulfillment · AI-populated form from inspection PDF", aspect: "4/3", src: "images/collaborative-screen-03.png", caption: "Vendors upload their inspection PDF and the system extracts answers into the structured form. What used to be double-entry becomes a quick review pass." },
+            { label: "Buyer review · accept or request revisions", aspect: "16/10", src: "images/collaborative-screen-04.png", caption: "Buyers verify the submitted inspection against the original PDF and either accept the order or request revisions." },
+          ],
+          pull: "Task success went from under 50% (and in some cases 0%) to 94%. Every participant said the new design was an improvement.",
+        },
+
+        compliance: {
+          slug: "compliance",
+          title: "Compliance Requirements",
+          subtitle: "Bringing insurance compliance into the payments flow for construction finance.",
+          cover: "images/compliance-cover.png",
+          researchImage: "images/compliance-research.png",
+          role: "Lead Product Designer · Lead Researcher",
+          team: "PM · EM · Engineering · Payments Team",
+          year: "2023 — 2024",
+          headers: {
+            context: "The Problem",
+            research: "Turning Research into Alignment",
+            process: "The Process",
+            screens: "What We Shipped",
+            outcomes: "Outcomes",
+          },
+          metrics: [
+            { value: "−50%", label: "Time to payment", note: "55 days → 27 days" },
+            { value: "$290M", label: "Processed", note: "in 18 months post-launch" },
+            { value: "200+", label: "Organizations", note: "using the platform" },
+            { value: "3", label: "Customers retained", note: "previously at risk of churn" },
+          ],
+          context: "Before a subcontractor can work on a construction project, they need to provide proof of insurance. Specific documents, in the required coverage amounts, current. For most teams that process lived entirely in email and cloud storage. Compliance managers were chasing documents and cross-referencing coverage amounts by hand across multi-year projects.",
+          contextLong: "The pain ran in two directions. Payments couldn't go out to non-compliant vendors, which created bottlenecks that slowed projects and frustrated subs. And if a project was audited, compliance managers had to prove every vendor was covered for the full life of the project. One missing document meant real legal and financial exposure. We wanted to make compliance trackable, get teams out of the manual chase, and give them confidence that their projects were covered at every stage.",
+          research: [],
+          researchNarrative: "I led design from discovery through delivery. Journey mapping came first to get everyone looking at the same picture. Once the existing workflow was drawn out end to end, the fragmentation was hard to miss, and the case for a purpose-built solution made itself. Wireframes for internal validation came next, then higher fidelity for customer testing.",
+          process: [
+            { phase: "Journey map", title: "Make the fragmentation visible", body: "Documented the existing compliance workflow end to end. Identified failure points and built stakeholder alignment around a single picture of the problem." },
+            { phase: "Wireframes", title: "Pressure-test the flows", body: "Low-fidelity explorations to pressure-test the core flows before investing in visual design." },
+            { phase: "Customer validation", title: "Test before build", body: "Increased fidelity and tested with customers to confirm the approach before development started." },
+            { phase: "Payments integration", title: "Surface compliance at the right moment", body: "Compliance status had to surface inside the payments flow, and documents had to be requestable before a payment could go out. That took close collaboration with the payments team. The goal was one experience, not two products glued together." },
+          ],
+          screens: [
+            { label: "Compliance templates", aspect: "16/10", src: "images/compliance-screen-01.png", caption: "Compliance managers define the requirements for a project once: coverage types, minimum amounts, expirations. The template then applies to every vendor on the job." },
+            { label: "Vendor document request · reply-based upload", aspect: "16/10", src: "images/compliance-screen-02.png", caption: "Vendors get a request link and upload directly, no account creation or training required. Replies route back into the project automatically." },
+            { label: "Automated extraction · mapped to requirements", aspect: "16/10", src: "images/compliance-screen-03.png", caption: "The platform reads uploaded certificates, pulls coverage data, and maps it to the requirements. Gaps surface before a payment goes out." },
+            { label: "Payment flow with inline compliance status", aspect: "4761/2772", src: "images/compliance-screen-04.png", fit: "contain", caption: "Compliance status surfaces inside the payments flow. One unmet requirement and the disbursement holds until it's resolved." },
+          ],
+          pull: "Before, we spent 1–2 hours per vendor tracking down compliance docs and cutting checks. Now we can focus on project financials.",
+        },
+
+        genui: {
+          slug: "genui",
+          title: "GenUI Component System",
+          subtitle: "A dynamic component set so the AI assistant can render the right format for the question.",
+          cover: "images/genui-cover.png",
+          role: "Lead Product Designer",
+          team: "Design · Engineering · Lender Team · Data Team",
+          year: "2026",
+          headers: {
+            context: "The Opportunity",
+            research: "Discovery",
+            process: "The Process",
+            screens: "What We Shipped",
+            outcomes: "Outcomes",
+          },
+          metrics: [
+            { value: "14", label: "Components", note: "designed in Figma" },
+            { value: "~40%", label: "Built & promoted", note: "to the design system" },
+            { value: "2", label: "Teams validated", note: "lender + data" },
+            { value: "1", label: "Agent response shell", note: "shared container pattern" },
+          ],
+          context: "When we launched our AI assistant, it could only respond in text. That worked for simple questions, but the platform handles complex financial data. Draws, inspections, compliance status, payment timelines. A paragraph of text often isn't the right container for any of that.",
+          contextLong: "There were two parts to this. First, the design system was missing pieces the new AI features needed. Second, and the more interesting one, I wanted to go past filling gaps and design components that render based on what someone actually asked. Ask about a payment, get a structured card. Ask about inspection data, get a chart. The response shapes itself to the question. This is the first version of that set.",
+          research: [
+            { label: "Audit 1", value: "Most-visited pages" },
+            { label: "Audit 2", value: "Existing AI interactions" },
+            { label: "Output priority", value: "Driven by usage data" },
+            { label: "Build partner", value: "Claude (in Figma)" },
+          ],
+          researchNarrative: "Before I designed anything, I wanted to know what people were actually looking for when they reached for AI. So I ran two audits in parallel. One looked at the most-visited pages in the product. The other looked at how people were using the existing text-only assistant. Between them I had the priority order for the component set, without having to guess.",
+          researchSkim: "Two audits, run side by side: most-visited pages, plus current AI interactions. The priority order came from what people were doing, not what we assumed.",
+          process: [
+            { phase: "Audit", title: "Two audits, in parallel", body: "Most-visited pages told us what content people return to. Existing AI usage told us what people ask and where text responses fall short. Together they prioritized the set." },
+            { phase: "Define", title: "14 organisms, one shell", body: "Designed cards, tables, charts, and the agent response shell that wraps them. The shell is the consistent container and interaction pattern any of the primitives render inside of." },
+            { phase: "Build with AI", title: "Figma + Claude", body: "Components were designed in Figma and built in collaboration with Claude. ~40% are built and promoted to the design system; the rest are in progress." },
+            { phase: "Validate", title: "Pressure-tested with the data-heavy teams", body: "Reviewed with the lender and data teams. Both said the set covered more than they needed, which is a meaningful bar given the complexity they deal with daily." },
+          ],
+          screens: [
+            { label: "Callout cards · tone-driven, single-record summaries", aspect: "842/1082", frame: "panel", fit: "contain", src: "images/genui-screen-01.png", caption: "A structured snapshot when the answer is a single record: payment, draw, inspection. Tone (negative, attention, positive, neutral) drives the accent, icon, and recommended action." },
+            { label: "Prompt suggestions · lists & follow-up chips", aspect: "852/640", frame: "panel", fit: "contain", src: "images/genui-screen-02.png", caption: "When the agent doesn't have a question yet, prompt suggestions kick things off. Pulled from common product flows and the user's recent activity." },
+            { label: "Charts · financial & inspection data", aspect: "856/1448", frame: "panel", fit: "contain", src: "images/genui-screen-03.png", caption: "For trend, distribution, and forecast questions, the agent reaches for a chart. Same financial data that lives elsewhere in the platform." },
+            { label: "Mini table · comparisons & status across many", aspect: "862/480", frame: "panel", fit: "contain", src: "images/genui-screen-04.png", caption: "When the question is about multiple items or status across a set, the agent renders a sortable table instead of a paragraph of bullet points." },
+            { label: "Agent response shell · wraps any primitive", aspect: "834/948", frame: "panel", fit: "contain", src: "images/genui-screen-05.png", caption: "The shared container any GenUI primitive renders inside. One consistent pattern (thought process, flagged signals, follow-ups) whether it's a card, a table, or a chart." },
+          ],
+          pull: "The agent decides which format best fits the answer instead of defaulting to text every time.",
+        },
+
+        money: {
+          slug: "money",
+          title: "Payment Improvements",
+          subtitle: "Two focused UX improvements that take work off the user and put it on the software.",
+          cover: "images/money-wizard-after.png",
+          role: "Lead Product Designer",
+          team: "Design · Engineering · Payments",
+          year: "2023 — 2025",
+          layout: "payments",
+          metrics: [
+            { value: "4 → 2", label: "Clicks to send payment", note: "wizard → drawer" },
+            { value: "2", label: "Friction wins", note: "shipped under one banner" },
+          ],
+          context: "Not every design problem needs starting from scratch. Payment Improvements was a pair of focused UX fixes that came straight out of customer feedback. Each one took aim at a specific point of friction in the payments experience.",
+          contextLong: "Same goal both times. Lower cognitive load, cut unnecessary steps, and make the software feel like it's working for the user rather than the other way around. Same approach too. Look for places where the interface is asking the user to do work the software could do instead, and fix them.",
+          improvements: [
+            {
+              slug: "tracker",
+              name: "Payment Tracker",
+              kicker: "Decision fatigue",
+              oneLiner: "One status, one action. The rest is available on demand.",
+              problem: "The original tracker surfaced too much at once. Several statuses, several contextual actions, and the path forward competing with the path behind for attention. Users had to parse the whole component just to find the next thing they could do.",
+              approach: "Show only the action that's relevant to the current status. Previous and upcoming steps are still there, tucked behind a track button, but they're no longer competing with the one decision the user needs to make right now.",
+              beforeLabel: "Before · everything visible at once",
+              afterLabel: "After · one action, history on demand",
+              beforeHint: "all statuses + actions stacked",
+              afterHint: "current step + track button",
+              beforeSrc: "images/money-tracker-before.png",
+              afterSrc: "images/money-tracker-after.png",
+              outcome: "The information density didn't drop. It just stopped fighting for attention.",
+            },
+            {
+              slug: "wizard",
+              name: "Wizard to Drawer",
+              kicker: "Step reduction",
+              oneLiner: "A four-click wizard collapsed into a single drawer.",
+              problem: "The Send Payment flow was a four-step wizard: amount, account, review, send. Each step lived on its own full screen. For a task that happens dozens of times a day, every extra click and page load added up.",
+              approach: "Consolidate every relevant detail into one drawer that overlays the current page. The user stays in context, sees the full picture at once, and confirms in two clicks instead of four.",
+              beforeLabel: "Before · four-step wizard",
+              afterLabel: "After · single drawer overlay",
+              beforeHint: "amount → account → review → send",
+              afterHint: "everything in one panel",
+              beforeSrc: "images/money-wizard-before.png",
+              afterSrc: "images/money-wizard-after.png",
+              outcome: "Two clicks instead of four, dozens of times a day. Over a year, the time saved adds up to something real.",
+            },
+          ],
+          pull: "Two clicks instead of four, dozens of times a day. The time saved adds up.",
+        },
+      };
+
+      /* ═══════════════════════════════════════════════════════════════════════
+         ATOMS
+         ═══════════════════════════════════════════════════════════════════════ */
+
+      /* Reveal — IntersectionObserver fade+translateY */
+      function Reveal({ children, delay = 0 }) {
+        const ref = useRef(null);
+        const [shown, setShown] = useState(false);
+        useEffect(() => {
+          const el = ref.current;
+          if (!el) return;
+          const obs = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((e) => {
+                if (e.isIntersecting) { setShown(true); obs.unobserve(el); }
+              });
+            },
+            { threshold: 0.12, rootMargin: "0px 0px -8% 0px" }
+          );
+          obs.observe(el);
+          return () => obs.disconnect();
+        }, []);
+        return (
+          <div
+            ref={ref}
+            style={{
+              opacity: shown ? 1 : 0,
+              transform: shown ? "translateY(0)" : "translateY(16px)",
+              transition: `opacity 700ms cubic-bezier(.2,.7,.2,1) ${delay}ms, transform 700ms cubic-bezier(.2,.7,.2,1) ${delay}ms`,
+            }}
+          >
+            {children}
+          </div>
+        );
+      }
+
+      /* Eyebrow */
+      function Eyebrow({ index, children, accent }) {
+        return (
+          <div
+            style={{
+              fontFamily: "var(--mono)",
+              fontSize: 11,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: accent ? "var(--accent)" : "rgba(255,255,255,0.45)",
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+            }}
+          >
+            {index != null && (
+              <span style={{ color: "var(--accent)" }}>
+                {String(index).padStart(2, "0")}
+              </span>
+            )}
+            {children}
+          </div>
+        );
+      }
+
+      /* Placeholder */
+      function Placeholder({ label, aspect = "16/10", style, hint, src, fit = "cover", frame }) {
+        const stripe = "rgba(255,255,255,0.025)";
+        const stripeAlt = "rgba(255,255,255,0.012)";
+
+        if (src && frame === "panel") {
+          return (
+            <div
+              style={{
+                aspectRatio: aspect,
+                width: "100%",
+                maxWidth: 640,
+                background: "#1a1530",
+                backgroundImage:
+                  "radial-gradient(1200px 600px at 20% 0%, #2c1f5e 0%, transparent 60%), radial-gradient(1000px 800px at 100% 100%, #1f1547 0%, transparent 60%)",
+                border: "1px solid rgba(255,255,255,0.06)",
+                borderRadius: 4,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "4%",
+                ...style,
+              }}
+            >
+              <img
+                src={src}
+                alt={label || ""}
+                loading="lazy"
+                style={{
+                  maxWidth: "100%",
+                  maxHeight: "100%",
+                  width: "auto",
+                  height: "auto",
+                  objectFit: "contain",
+                  borderRadius: 10,
+                  boxShadow: "0 30px 80px -20px rgba(0,0,0,0.55), 0 8px 24px -8px rgba(0,0,0,0.35)",
+                }}
+              />
+            </div>
+          );
+        }
+
+        if (src) {
+          return (
+            <div
+              style={{
+                aspectRatio: aspect,
+                width: "100%",
+                position: "relative",
+                background: "rgba(255,255,255,0.02)",
+                border: "1px solid rgba(255,255,255,0.06)",
+                borderRadius: 4,
+                overflow: "hidden",
+                ...style,
+              }}
+            >
+              <img
+                src={src}
+                alt={label || ""}
+                loading="lazy"
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: fit,
+                  objectPosition: "center top",
+                  display: "block",
+                }}
+              />
+            </div>
+          );
+        }
+
+        return (
+          <div
+            style={{
+              aspectRatio: aspect,
+              width: "100%",
+              position: "relative",
+              background: `repeating-linear-gradient(135deg, ${stripe} 0 1px, ${stripeAlt} 1px 9px)`,
+              border: "1px solid rgba(255,255,255,0.06)",
+              borderRadius: 4,
+              overflow: "hidden",
+              ...style,
+            }}
+          >
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                padding: "14px 16px",
+                fontFamily: "var(--mono)",
+                fontSize: 10,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                color: "rgba(255,255,255,0.45)",
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                  <span
+                    style={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: 999,
+                      background: "var(--accent)",
+                      boxShadow: "0 0 8px var(--accent)",
+                    }}
+                  />
+                  placeholder
+                </span>
+                <span style={{ opacity: 0.6 }}>{aspect}</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "flex-end" }}>
+                {hint && <div style={{ opacity: 0.55 }}>{hint}</div>}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      /* Stat */
+      function Stat({ value, label, note, size = "lg", accent = false }) {
+        const sizes = { sm: { v: 32, l: 10 }, md: { v: 48, l: 11 }, lg: { v: 72, l: 11 }, xl: { v: 112, l: 12 } };
+        const s = sizes[size] || sizes.lg;
+        return (
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <div
+              style={{
+                fontSize: s.v,
+                lineHeight: 0.95,
+                letterSpacing: "-0.03em",
+                fontWeight: 500,
+                color: accent ? "var(--accent)" : "var(--fg)",
+                fontFeatureSettings: '"tnum" 1, "ss01" 1',
+              }}
+            >
+              {value}
+            </div>
+            <div
+              style={{
+                fontFamily: "var(--mono)",
+                fontSize: s.l,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: "rgba(255,255,255,0.55)",
+              }}
+            >
+              {label}
+            </div>
+            {note && (
+              <div
+                style={{
+                  fontFamily: "var(--mono)",
+                  fontSize: 10,
+                  color: "rgba(255,255,255,0.35)",
+                  letterSpacing: "0.04em",
+                }}
+              >
+                {note}
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      /* ViewToggle */
+      function ViewToggle({ value, onChange, density = "comfortable" }) {
+        return (
+          <div
+            style={{
+              display: "inline-flex",
+              background: "rgba(255,255,255,0.04)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              borderRadius: 999,
+              padding: 3,
+              fontFamily: "var(--mono)",
+              fontSize: 11,
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+            }}
+          >
+            {["full", "skim"].map((mode) => {
+              const active = value === mode;
+              return (
+                <button
+                  key={mode}
+                  onClick={() => onChange(mode)}
+                  style={{
+                    padding: density === "compact" ? "5px 12px" : "7px 14px",
+                    border: 0,
+                    borderRadius: 999,
+                    background: active ? "var(--accent)" : "transparent",
+                    color: active ? "#0a0a0a" : "rgba(255,255,255,0.6)",
+                    cursor: "pointer",
+                    fontFamily: "inherit",
+                    fontSize: "inherit",
+                    letterSpacing: "inherit",
+                    textTransform: "inherit",
+                    fontWeight: active ? 600 : 400,
+                    transition: "background var(--t-fast), color var(--t-fast)",
+                  }}
+                >
+                  {mode}
+                </button>
+              );
+            })}
+          </div>
+        );
+      }
+
+      /* Skim */
+      function Skim({ children, when }) {
+        if (when !== "skim") return null;
+        return (
+          <div
+            style={{
+              padding: "16px 18px",
+              background: "rgba(255,255,255,0.02)",
+              border: "1px solid rgba(255,255,255,0.06)",
+              borderLeft: "2px solid var(--accent)",
+              borderRadius: 2,
+              fontFamily: "var(--mono)",
+              fontSize: 12,
+              letterSpacing: "0.02em",
+              color: "rgba(255,255,255,0.75)",
+              lineHeight: 1.5,
+            }}
+          >
+            {children}
+          </div>
+        );
+      }
+
+      /* PortfolioChrome */
+      function PortfolioChrome({ current }) {
+        return (
+          <header
+            style={{
+              position: "sticky",
+              top: 0,
+              zIndex: 50,
+              background: "color-mix(in oklab, var(--bg) 80%, transparent)",
+              backdropFilter: "blur(12px)",
+              borderBottom: "1px solid rgba(255,255,255,0.06)",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "14px 32px",
+                fontFamily: "var(--mono)",
+                fontSize: 11,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
+                <a
+                  href="index.html"
+                  style={{
+                    color: "var(--fg)",
+                    textDecoration: "none",
+                    fontWeight: 600,
+                    fontFamily: "var(--sans)",
+                    fontSize: 14,
+                    letterSpacing: "-0.01em",
+                    textTransform: "none",
+                  }}
+                >
+                  Jay Arnold
+                </a>
+                <nav
+                  style={{
+                    display: "flex",
+                    gap: 22,
+                    color: "rgba(255,255,255,0.55)",
+                    fontFamily: "var(--sans)",
+                    fontSize: 14,
+                    letterSpacing: "-0.01em",
+                    textTransform: "none",
+                  }}
+                >
+                  <a
+                    href="index.html"
+                    style={{
+                      color: current === "work" ? "var(--fg)" : "inherit",
+                      textDecoration: "none",
+                      fontWeight: current === "work" ? 500 : 400,
+                    }}
+                  >
+                    Work
+                  </a>
+                  <a
+                    href="about.html"
+                    style={{
+                      color: current === "about" ? "var(--fg)" : "inherit",
+                      textDecoration: "none",
+                      fontWeight: current === "about" ? 500 : 400,
+                    }}
+                  >
+                    About
+                  </a>
+                </nav>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--accent)" }}>
+                <span
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: 999,
+                    background: "var(--accent)",
+                    boxShadow: "0 0 8px var(--accent)",
+                  }}
+                />
+                Available for work
+              </div>
+            </div>
+          </header>
+        );
+      }
+
+      /* NextCaseStudy */
+      function NextCaseStudy({ next, density = "comfortable" }) {
+        const [hover, setHover] = useState(false);
+        const padX = density === "compact" ? 24 : 32;
+        const padY = density === "compact" ? 28 : 48;
+        return (
+          <a
+            href={`case-study.html?study=${next.slug}`}
+            onMouseEnter={() => setHover(true)}
+            onMouseLeave={() => setHover(false)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: `${padY}px ${padX}px`,
+              marginInline: -padX,
+              borderTop: "1px solid rgba(255,255,255,0.08)",
+              borderBottom: "1px solid rgba(255,255,255,0.08)",
+              color: "var(--fg)",
+              textDecoration: "none",
+              gap: 24,
+              background: hover ? "rgba(255,255,255,0.015)" : "transparent",
+              transition: "background var(--t-med)",
+            }}
+          >
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <div
+                style={{
+                  fontFamily: "var(--mono)",
+                  fontSize: 11,
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase",
+                  color: hover ? "var(--accent)" : "rgba(255,255,255,0.45)",
+                  transition: "color var(--t-fast)",
+                }}
+              >
+                Next case study
+              </div>
+              <div
+                style={{
+                  fontSize: density === "compact" ? 32 : 44,
+                  lineHeight: 1.05,
+                  letterSpacing: "-0.02em",
+                  fontWeight: 500,
+                  color: hover ? "var(--fg)" : "rgba(255,255,255,0.92)",
+                  transition: "color var(--t-fast)",
+                }}
+              >
+                {next.title}
+              </div>
+            </div>
+            <span
+              style={{
+                fontFamily: "var(--mono)",
+                color: hover ? "var(--accent)" : "rgba(255,255,255,0.5)",
+                fontSize: 24,
+                transform: hover ? "translateX(8px)" : "translateX(0)",
+                transition: "transform var(--t-med), color var(--t-fast)",
+                display: "inline-block",
+              }}
+            >
+              →
+            </span>
+          </a>
+        );
+      }
+
+      /* ContactLinks */
+      function ContactLinks({ compact }) {
+        const items = [
+          ["Email", "jaymillerarnold@gmail.com", "mailto:jaymillerarnold@gmail.com", {}],
+          ["Resume", "Jay_Arnold_Resume.pdf", "Jay_Arnold_Resume.pdf", { download: true }],
+          ["LinkedIn", "in/jay-m-arnold", "https://www.linkedin.com/in/jay-m-arnold/", { external: true }],
+        ];
+        if (compact) {
+          return (
+            <div
+              style={{
+                display: "flex",
+                gap: 28,
+                flexWrap: "wrap",
+                fontFamily: "var(--mono)",
+                fontSize: 11,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "rgba(255,255,255,0.55)",
+              }}
+            >
+              {items.map(([label, , href, opts]) => (
+                <a
+                  key={label}
+                  href={href}
+                  {...(opts.download ? { download: "" } : {})}
+                  {...(opts.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                  style={{ color: "inherit", textDecoration: "none" }}
+                >
+                  {label} ↗
+                </a>
+              ))}
+            </div>
+          );
+        }
+        return (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 14,
+              fontFamily: "var(--mono)",
+              fontSize: 12,
+              letterSpacing: "0.04em",
+              color: "rgba(255,255,255,0.55)",
+            }}
+          >
+            {items.map(([label, val, href, opts]) => (
+              <a
+                key={label}
+                href={href}
+                {...(opts.download ? { download: "" } : {})}
+                {...(opts.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  paddingBlock: 10,
+                  borderBottom: "1px solid rgba(255,255,255,0.06)",
+                  color: "inherit",
+                  textDecoration: "none",
+                }}
+              >
+                <span style={{ color: "rgba(255,255,255,0.85)" }}>{label}</span>
+                <span>{val} ↗</span>
+              </a>
+            ))}
+          </div>
+        );
+      }
+
+      /* SiteFooter */
+      function SiteFooter({ maxWidth = 1400 }) {
+        return (
+          <footer
+            style={{
+              maxWidth,
+              margin: "0 auto",
+              padding: "32px 32px 48px",
+              borderTop: "1px solid rgba(255,255,255,0.08)",
+              display: "flex",
+              flexDirection: "column",
+              gap: 16,
+            }}
+          >
+            <div
+              style={{
+                marginTop: 40,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: 24,
+                flexWrap: "wrap",
+                fontFamily: "var(--mono)",
+                fontSize: 11,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "rgba(255,255,255,0.55)",
+              }}
+            >
+              <span>© 2026 Jay Arnold · Durango, CO</span>
+              <ContactLinks compact />
+            </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: 24,
+                flexWrap: "wrap",
+                fontFamily: "var(--mono)",
+                fontSize: 10,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: "rgba(255,255,255,0.32)",
+              }}
+            >
+              <span>Geist + Geist Mono</span>
+              <span>Designed in Figma · Built in Claude Code</span>
+            </div>
+          </footer>
+        );
+      }
+
+      /* ═══════════════════════════════════════════════════════════════════════
+         SHARED HELPERS
+         ═══════════════════════════════════════════════════════════════════════ */
+      function densityScale(d) {
+        if (d === "compact") return { padX: 40, heroY: 80, sectionY: 56, gap: 56, h1: 80, h2: 32, h3: 22, lede: 18 };
+        return { padX: 56, heroY: 112, sectionY: 76, gap: 72, h1: 104, h2: 38, h3: 24, lede: 20 };
+      }
+
+      function textP() {
+        return {
+          fontSize: 16,
+          lineHeight: 1.6,
+          color: "rgba(255,255,255,0.78)",
+          margin: 0,
+          maxWidth: "62ch",
+          textWrap: "pretty",
+        };
+      }
+
+      function nextStudy(slug, all) {
+        const keys = Object.keys(all);
+        const idx = (keys.indexOf(slug) + 1) % keys.length;
+        return all[keys[idx]];
+      }
+
+      /* ═══════════════════════════════════════════════════════════════════════
+         EDITORIAL LAYOUT
+         ═══════════════════════════════════════════════════════════════════════ */
+
+      function HeroAE({ study, D }) {
+        return (
+          <section
+            style={{
+              maxWidth: 1240,
+              margin: "0 auto",
+              padding: `${D.heroY}px ${D.padX}px ${D.heroY * 0.5}px`,
+            }}
+          >
+            <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+              <h1
+                style={{
+                  fontSize: D.h1,
+                  lineHeight: 1.0,
+                  letterSpacing: "-0.035em",
+                  margin: 0,
+                  fontWeight: 500,
+                  maxWidth: "16ch",
+                }}
+              >
+                {study.title}
+              </h1>
+              {study.subtitle && (
+                <p
+                  style={{
+                    fontSize: D.lede,
+                    lineHeight: 1.35,
+                    margin: 0,
+                    color: "rgba(255,255,255,0.65)",
+                    maxWidth: "44ch",
+                    fontWeight: 400,
+                  }}
+                >
+                  {study.subtitle}
+                </p>
+              )}
+            </div>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(4, 1fr)",
+                gap: 24,
+                marginTop: D.sectionY,
+                paddingTop: 32,
+                borderTop: "1px solid rgba(255,255,255,0.1)",
+              }}
+            >
+              {[["Role", study.role], ["Team", study.team], ["Year", study.year]].map(([k, v]) => (
+                <div key={k} style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  <div
+                    style={{
+                      fontFamily: "var(--mono)",
+                      fontSize: 10,
+                      letterSpacing: "0.12em",
+                      textTransform: "uppercase",
+                      color: "rgba(255,255,255,0.4)",
+                    }}
+                  >
+                    {k}
+                  </div>
+                  <div style={{ fontSize: 14, color: "rgba(255,255,255,0.85)" }}>{v}</div>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ marginTop: D.sectionY }}>
+              <Placeholder src={study.cover} aspect="21/9" label={`${study.title} · hero`} />
+            </div>
+          </section>
+        );
+      }
+
+      function Section({ id, index, title, D, total = 5, children }) {
+        return (
+          <section
+            id={id}
+            style={{ display: "flex", flexDirection: "column", gap: 28, scrollMarginTop: 80 }}
+          >
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <Eyebrow index={index}>{`/ ${String(total).padStart(2, "0")}`}</Eyebrow>
+              <h2
+                style={{
+                  fontSize: D.h2,
+                  margin: 0,
+                  letterSpacing: "-0.025em",
+                  fontWeight: 500,
+                }}
+              >
+                {title}
+              </h2>
+            </div>
+            {children}
+          </section>
+        );
+      }
+
+      function CaseEditorial({ study, all, mode, setMode, density = "compact" }) {
+        const D = densityScale(density);
+        const H = study.headers || {};
+        const sections = [
+          { id: "context",  label: H.context  || "Context",  navLabel: H.contextNav  || H.context  || "Context"  },
+          { id: "research", label: H.research || "Research", navLabel: H.researchNav || H.research || "Research" },
+          { id: "process",  label: H.process  || "Process",  navLabel: H.processNav  || H.process  || "Process"  },
+          { id: "screens",  label: H.screens  || "Screens",  navLabel: H.screensNav  || H.screens  || "Screens"  },
+          { id: "outcomes", label: H.outcomes || "Outcomes", navLabel: H.outcomesNav || H.outcomes || "Outcomes" },
+        ];
+        const [active, setActive] = useState("context");
+
+        useEffect(() => {
+          const obs = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((e) => { if (e.isIntersecting) setActive(e.target.id.replace(`-${study.slug}`, "").replace("ed-", "")); });
+            },
+            { rootMargin: "-30% 0px -55% 0px", threshold: 0 }
+          );
+          sections.forEach((s) => {
+            const el = document.getElementById(`ed-${s.id}-${study.slug}`);
+            if (el) obs.observe(el);
+          });
+          return () => obs.disconnect();
+        }, [study.slug]);
+
+        const next = nextStudy(study.slug, all);
+
+        return (
+          <article style={{ background: "var(--bg)", color: "var(--fg)", fontFamily: "var(--sans)" }}>
+            <PortfolioChrome />
+            <HeroAE study={study} D={D} />
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "200px 1fr",
+                gap: D.gap,
+                maxWidth: 1240,
+                margin: "0 auto",
+                padding: `0 ${D.padX}px`,
+              }}
+            >
+              {/* Sticky nav */}
+              <aside style={{ position: "sticky", top: 80, alignSelf: "start", paddingTop: D.sectionY }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  <div style={{ marginBottom: 8 }}>
+                    <ViewToggle value={mode} onChange={setMode} density={density} />
+                  </div>
+                  <Eyebrow>Contents</Eyebrow>
+                  <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 4 }}>
+                    {sections.map((s, i) => {
+                      const isActive = active === s.id;
+                      return (
+                        <li key={s.id}>
+                          <a
+                            href={`#ed-${s.id}-${study.slug}`}
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 10,
+                              padding: "6px 0",
+                              color: isActive ? "var(--fg)" : "rgba(255,255,255,0.4)",
+                              textDecoration: "none",
+                              fontSize: 13,
+                              transition: "color var(--t-fast)",
+                            }}
+                          >
+                            <span
+                              style={{
+                                width: isActive ? 18 : 8,
+                                height: 1,
+                                background: isActive ? "var(--accent)" : "rgba(255,255,255,0.2)",
+                                transition: "width var(--t-med), background var(--t-fast)",
+                              }}
+                            />
+                            <span style={{ fontFamily: "var(--mono)", fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                              {String(i + 1).padStart(2, "0")} {s.navLabel}
+                            </span>
+                          </a>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              </aside>
+
+              {/* Body */}
+              <main style={{ display: "flex", flexDirection: "column", gap: D.sectionY * 1.4 }}>
+                {/* CONTEXT */}
+                <Section id={`ed-context-${study.slug}`} index={1} title={sections[0].label} D={D}>
+                  <Skim when={mode}>{study.context}</Skim>
+                  {mode === "full" && (
+                    <>
+                      {(study.contextLong || study.context).split(/\n\n+/).map((para, i) => (
+                        <p key={i} style={textP()}>{para}</p>
+                      ))}
+                    </>
+                  )}
+                </Section>
+
+                {/* RESEARCH */}
+                <Section id={`ed-research-${study.slug}`} index={2} title={sections[1].label} D={D}>
+                  {study.researchSkim && <Skim when={mode}>{study.researchSkim}</Skim>}
+                  {mode === "full" && (
+                    <>
+                      {study.research && study.research.length > 0 && (
+                        <div
+                          style={{
+                            display: "grid",
+                            gridTemplateColumns: "repeat(4, 1fr)",
+                            gap: 24,
+                            padding: "28px 0",
+                            borderTop: "1px solid rgba(255,255,255,0.08)",
+                            borderBottom: "1px solid rgba(255,255,255,0.08)",
+                          }}
+                        >
+                          {study.research.map((r) => (
+                            <Stat key={r.label} value={r.value} label={r.label} size="md" />
+                          ))}
+                        </div>
+                      )}
+                      <p style={textP()}>{study.researchNarrative}</p>
+                    </>
+                  )}
+                  {study.researchImage && (
+                    <Reveal>
+                      <Placeholder src={study.researchImage} aspect="16/9" label="Research" />
+                    </Reveal>
+                  )}
+                </Section>
+
+                {/* PROCESS */}
+                <Section id={`ed-process-${study.slug}`} index={3} title={sections[2].label} D={D}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+                    {study.process.map((p, i) => (
+                      <Reveal key={p.phase} delay={i * 60}>
+                        <div
+                          style={{
+                            display: "grid",
+                            gridTemplateColumns: "120px 1fr",
+                            gap: 24,
+                            padding: "28px 0",
+                            borderTop: i === 0 ? "1px solid rgba(255,255,255,0.08)" : "none",
+                            borderBottom: "1px solid rgba(255,255,255,0.08)",
+                          }}
+                        >
+                          <div
+                            style={{
+                              fontFamily: "var(--mono)",
+                              fontSize: 11,
+                              letterSpacing: "0.1em",
+                              textTransform: "uppercase",
+                              color: "var(--accent)",
+                              paddingTop: 6,
+                            }}
+                          >
+                            {String(i + 1).padStart(2, "0")} · {p.phase}
+                          </div>
+                          <div>
+                            <h3
+                              style={{
+                                fontSize: D.h3,
+                                letterSpacing: "-0.015em",
+                                margin: "0 0 12px",
+                                fontWeight: 500,
+                              }}
+                            >
+                              {p.title}
+                            </h3>
+                            {mode === "full" && (
+                              <p style={{ ...textP(), color: "rgba(255,255,255,0.65)", margin: 0 }}>
+                                {p.body}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </Reveal>
+                    ))}
+                  </div>
+                </Section>
+
+                {/* PULL QUOTE */}
+                <Reveal>
+                  <div
+                    style={{
+                      padding: `${D.sectionY * 0.6}px 0`,
+                      borderTop: "1px solid rgba(255,255,255,0.08)",
+                      borderBottom: "1px solid rgba(255,255,255,0.08)",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: D.h2 * 0.85,
+                        lineHeight: 1.2,
+                        letterSpacing: "-0.02em",
+                        fontWeight: 400,
+                        fontStyle: "italic",
+                        color: "var(--fg)",
+                      }}
+                    >
+                      <span style={{ color: "var(--accent)", marginRight: 8 }}>"</span>
+                      {study.pull}
+                    </div>
+                  </div>
+                </Reveal>
+
+                {/* SCREENS */}
+                <Section id={`ed-screens-${study.slug}`} index={4} title={sections[3].label} D={D}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 40 }}>
+                    {study.screens.map((s, i) => (
+                      <Reveal key={s.label} delay={i * 50}>
+                        <figure style={{ margin: 0, display: "flex", flexDirection: "column", gap: 16 }}>
+                          <Placeholder
+                            label={s.label}
+                            src={s.src}
+                            aspect={s.aspect}
+                            fit={s.fit}
+                            frame={s.frame}
+                            hint={s.src ? null : `screen ${String(i + 1).padStart(2, "0")}`}
+                          />
+                          {s.caption && (
+                            <figcaption style={{ paddingLeft: 2, maxWidth: "62ch" }}>
+                              <p
+                                style={{
+                                  margin: 0,
+                                  fontSize: 15,
+                                  lineHeight: 1.55,
+                                  color: "rgba(255,255,255,0.65)",
+                                  textWrap: "pretty",
+                                }}
+                              >
+                                {s.caption}
+                              </p>
+                            </figcaption>
+                          )}
+                        </figure>
+                      </Reveal>
+                    ))}
+                  </div>
+                </Section>
+
+                {/* OUTCOMES */}
+                <Section id={`ed-outcomes-${study.slug}`} index={5} title={sections[4].label} D={D}>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(2, 1fr)",
+                      gap: 48,
+                      padding: "32px 0",
+                      borderTop: "1px solid rgba(255,255,255,0.08)",
+                      borderBottom: "1px solid rgba(255,255,255,0.08)",
+                    }}
+                  >
+                    {study.metrics.map((m, i) => (
+                      <Reveal key={m.label} delay={i * 80}>
+                        <Stat value={m.value} label={m.label} note={m.note} size="lg" accent={i === 0} />
+                      </Reveal>
+                    ))}
+                  </div>
+                </Section>
+
+                <div style={{ marginTop: D.sectionY }}>
+                  <NextCaseStudy next={next} density={density} />
+                </div>
+              </main>
+            </div>
+
+            <SiteFooter maxWidth={1240} />
+          </article>
+        );
+      }
+
+      /* ═══════════════════════════════════════════════════════════════════════
+         PAYMENTS LAYOUT
+         ═══════════════════════════════════════════════════════════════════════ */
+
+      function BeforeAfter({ imp, view, setView }) {
+        const isBefore = view === "before";
+        const label = isBefore ? imp.beforeLabel : imp.afterLabel;
+        const src = isBefore ? imp.beforeSrc : imp.afterSrc;
+
+        return (
+          <figure style={{ margin: 0, display: "flex", flexDirection: "column", gap: 16 }}>
+            {/* Toggle row */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 16,
+                flexWrap: "wrap",
+              }}
+            >
+              <div
+                style={{
+                  display: "inline-flex",
+                  background: "rgba(255,255,255,0.04)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  borderRadius: 999,
+                  padding: 3,
+                  fontFamily: "var(--mono)",
+                  fontSize: 11,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                }}
+              >
+                {["before", "after"].map((v) => {
+                  const active = view === v;
+                  return (
+                    <button
+                      key={v}
+                      onClick={() => setView(v)}
+                      style={{
+                        padding: "7px 16px",
+                        border: 0,
+                        borderRadius: 999,
+                        background: active ? "var(--accent)" : "transparent",
+                        color: active ? "#0a0a0a" : "rgba(255,255,255,0.6)",
+                        cursor: "pointer",
+                        fontFamily: "inherit",
+                        fontSize: "inherit",
+                        letterSpacing: "inherit",
+                        textTransform: "inherit",
+                        fontWeight: active ? 600 : 400,
+                        transition: "background var(--t-fast), color var(--t-fast)",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 8,
+                      }}
+                    >
+                      <span
+                        style={{
+                          width: 5,
+                          height: 5,
+                          borderRadius: 999,
+                          background: active ? "#0a0a0a" : "rgba(255,255,255,0.4)",
+                        }}
+                      />
+                      {v}
+                    </button>
+                  );
+                })}
+              </div>
+              <div
+                style={{
+                  fontFamily: "var(--mono)",
+                  fontSize: 10,
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase",
+                  color: "rgba(255,255,255,0.45)",
+                }}
+              >
+                {isBefore ? "Original design" : "Shipped design"}
+              </div>
+            </div>
+
+            {/* Stage */}
+            <div
+              style={{
+                position: "relative",
+                width: "100%",
+                aspectRatio: "16/10",
+                borderRadius: 4,
+                overflow: "hidden",
+              }}
+            >
+              {["before", "after"].map((v) => {
+                const visible = view === v;
+                const vSrc = v === "before" ? imp.beforeSrc : imp.afterSrc;
+                const vLabel = v === "before" ? imp.beforeLabel : imp.afterLabel;
+                const vHint = v === "before" ? imp.beforeHint : imp.afterHint;
+                return (
+                  <div
+                    key={v}
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      opacity: visible ? 1 : 0,
+                      transform: visible ? "scale(1)" : "scale(0.995)",
+                      transition: "opacity 380ms cubic-bezier(.2,.7,.2,1), transform 380ms cubic-bezier(.2,.7,.2,1)",
+                      pointerEvents: visible ? "auto" : "none",
+                    }}
+                  >
+                    <Placeholder label={vLabel} aspect="16/10" hint={vHint} src={vSrc} />
+                  </div>
+                );
+              })}
+            </div>
+
+            <figcaption style={{ paddingLeft: 2, maxWidth: "62ch" }}>
+              <p style={{ margin: 0, fontSize: 15, lineHeight: 1.55, color: "rgba(255,255,255,0.65)", textWrap: "pretty" }}>
+                {label}
+              </p>
+            </figcaption>
+          </figure>
+        );
+      }
+
+      function ImprovementBlock({ imp, index, total, D, mode, study }) {
+        const [view, setView] = useState("after");
+
+        return (
+          <section
+            id={`pay-imp-${imp.slug}-${study.slug}`}
+            style={{ display: "flex", flexDirection: "column", gap: 32, scrollMarginTop: 80 }}
+          >
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <Eyebrow index={index + 1}>{`/ ${String(total).padStart(2, "0")}`}</Eyebrow>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 18, flexWrap: "wrap" }}>
+                <h2 style={{ fontSize: D.h2, margin: 0, letterSpacing: "-0.025em", fontWeight: 500 }}>
+                  {imp.name}
+                </h2>
+                <span
+                  style={{
+                    fontFamily: "var(--mono)",
+                    fontSize: 11,
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    color: "var(--accent)",
+                  }}
+                >
+                  {imp.kicker}
+                </span>
+              </div>
+              <p style={{ margin: 0, fontSize: D.lede * 0.9, lineHeight: 1.4, color: "rgba(255,255,255,0.7)", maxWidth: "52ch", fontWeight: 400 }}>
+                {imp.oneLiner}
+              </p>
+            </div>
+
+            {mode === "full" && (
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: 0,
+                  borderTop: "1px solid rgba(255,255,255,0.08)",
+                  borderBottom: "1px solid rgba(255,255,255,0.08)",
+                }}
+              >
+                {[["Problem", imp.problem], ["Approach", imp.approach]].map(([label, body], i) => (
+                  <div
+                    key={label}
+                    style={{
+                      padding: "28px 28px 28px 0",
+                      paddingLeft: i === 0 ? 0 : 28,
+                      borderLeft: i === 0 ? "none" : "1px solid rgba(255,255,255,0.06)",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 14,
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontFamily: "var(--mono)",
+                        fontSize: 11,
+                        letterSpacing: "0.12em",
+                        textTransform: "uppercase",
+                        color: i === 0 ? "rgba(255,255,255,0.45)" : "var(--accent)",
+                      }}
+                    >
+                      {label}
+                    </div>
+                    <p style={{ margin: 0, fontSize: 16, lineHeight: 1.6, color: "rgba(255,255,255,0.78)", maxWidth: "48ch", textWrap: "pretty" }}>
+                      {body}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <Reveal>
+              <BeforeAfter imp={imp} view={view} setView={setView} D={D} />
+            </Reveal>
+
+            {imp.outcome && mode === "full" && (
+              <Reveal>
+                <div style={{ display: "flex", gap: 14, alignItems: "flex-start", padding: "20px 0 4px" }}>
+                  <span
+                    style={{
+                      fontFamily: "var(--mono)",
+                      fontSize: 10,
+                      letterSpacing: "0.14em",
+                      textTransform: "uppercase",
+                      color: "var(--accent)",
+                      paddingTop: 4,
+                      minWidth: 78,
+                    }}
+                  >
+                    Outcome
+                  </span>
+                  <p style={{ margin: 0, fontSize: 17, lineHeight: 1.5, color: "var(--fg)", letterSpacing: "-0.005em", maxWidth: "52ch", textWrap: "pretty" }}>
+                    {imp.outcome}
+                  </p>
+                </div>
+              </Reveal>
+            )}
+          </section>
+        );
+      }
+
+      function HeroP({ study, D, improvements }) {
+        return (
+          <section
+            style={{
+              maxWidth: 1240,
+              margin: "0 auto",
+              padding: `${D.heroY}px ${D.padX}px ${D.heroY * 0.5}px`,
+            }}
+          >
+            <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+              <h1
+                style={{
+                  fontSize: D.h1,
+                  lineHeight: 1.0,
+                  letterSpacing: "-0.035em",
+                  margin: 0,
+                  fontWeight: 500,
+                  maxWidth: "16ch",
+                }}
+              >
+                {study.title}
+              </h1>
+              {study.subtitle && (
+                <p style={{ fontSize: D.lede, lineHeight: 1.35, margin: 0, color: "rgba(255,255,255,0.65)", maxWidth: "44ch", fontWeight: 400 }}>
+                  {study.subtitle}
+                </p>
+              )}
+            </div>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(4, 1fr)",
+                gap: 24,
+                marginTop: D.sectionY,
+                paddingTop: 32,
+                borderTop: "1px solid rgba(255,255,255,0.1)",
+              }}
+            >
+              {[
+                ["Role", study.role],
+                ["Team", study.team],
+                ["Year", study.year],
+                ["Shipped", String(improvements.length) + " improvements"],
+              ].map(([k, v]) => (
+                <div key={k} style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  <div
+                    style={{
+                      fontFamily: "var(--mono)",
+                      fontSize: 10,
+                      letterSpacing: "0.12em",
+                      textTransform: "uppercase",
+                      color: "rgba(255,255,255,0.4)",
+                    }}
+                  >
+                    {k}
+                  </div>
+                  <div style={{ fontSize: 14, color: "rgba(255,255,255,0.85)" }}>{v}</div>
+                </div>
+              ))}
+            </div>
+          </section>
+        );
+      }
+
+      function CasePayments({ study, all, mode, setMode, density = "compact" }) {
+        const D = densityScale(density);
+        const improvements = study.improvements || [];
+        const sections = [
+          { id: "intro", label: "The Approach" },
+          ...improvements.map((imp, i) => ({ id: `imp-${imp.slug}`, label: imp.name, index: i + 1 })),
+          { id: "throughline", label: "Throughline" },
+          { id: "outcomes", label: "Outcomes" },
+        ];
+        const [active, setActive] = useState("intro");
+
+        useEffect(() => {
+          const obs = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((e) => { if (e.isIntersecting) setActive(e.target.id.replace(`pay-`, "").replace(`-${study.slug}`, "")); });
+            },
+            { rootMargin: "-30% 0px -55% 0px", threshold: 0 }
+          );
+          sections.forEach((s) => {
+            const el = document.getElementById(`pay-${s.id}-${study.slug}`);
+            if (el) obs.observe(el);
+          });
+          return () => obs.disconnect();
+        }, [study.slug, improvements.length]);
+
+        const next = nextStudy(study.slug, all);
+
+        return (
+          <article style={{ background: "var(--bg)", color: "var(--fg)", fontFamily: "var(--sans)" }}>
+            <PortfolioChrome />
+            <HeroP study={study} D={D} improvements={improvements} />
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "200px 1fr",
+                gap: D.gap,
+                maxWidth: 1240,
+                margin: "0 auto",
+                padding: `0 ${D.padX}px`,
+              }}
+            >
+              {/* Sticky nav */}
+              <aside style={{ position: "sticky", top: 80, alignSelf: "start", paddingTop: D.sectionY }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  <div style={{ marginBottom: 8 }}>
+                    <ViewToggle value={mode} onChange={setMode} density={density} />
+                  </div>
+                  <Eyebrow>Contents</Eyebrow>
+                  <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 4 }}>
+                    {sections.map((s, i) => {
+                      const isActive = active === s.id;
+                      return (
+                        <li key={s.id}>
+                          <a
+                            href={`#pay-${s.id}-${study.slug}`}
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 10,
+                              padding: "6px 0",
+                              color: isActive ? "var(--fg)" : "rgba(255,255,255,0.4)",
+                              textDecoration: "none",
+                              fontSize: 13,
+                              transition: "color var(--t-fast)",
+                            }}
+                          >
+                            <span
+                              style={{
+                                width: isActive ? 18 : 8,
+                                height: 1,
+                                background: isActive ? "var(--accent)" : "rgba(255,255,255,0.2)",
+                                transition: "width var(--t-med), background var(--t-fast)",
+                              }}
+                            />
+                            <span style={{ fontFamily: "var(--mono)", fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                              {String(i + 1).padStart(2, "0")} {s.label}
+                            </span>
+                          </a>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              </aside>
+
+              {/* Body */}
+              <main style={{ display: "flex", flexDirection: "column", gap: D.sectionY * 1.4 }}>
+                {/* INTRO */}
+                <section
+                  id={`pay-intro-${study.slug}`}
+                  style={{ display: "flex", flexDirection: "column", gap: 28, scrollMarginTop: 80 }}
+                >
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    <Eyebrow index={1}>{`/ ${String(sections.length).padStart(2, "0")}`}</Eyebrow>
+                    <h2 style={{ fontSize: D.h2, margin: 0, letterSpacing: "-0.025em", fontWeight: 500 }}>
+                      {sections[0].label}
+                    </h2>
+                  </div>
+                  <Skim when={mode}>{study.context}</Skim>
+                  {mode === "full" && (
+                    <>
+                      {(study.contextLong || study.context).split(/\n\n+/).map((para, i) => (
+                        <p key={i} style={textP()}>{para}</p>
+                      ))}
+                    </>
+                  )}
+                </section>
+
+                {/* IMPROVEMENTS */}
+                {improvements.map((imp, i) => (
+                  <ImprovementBlock
+                    key={imp.slug}
+                    imp={imp}
+                    index={i + 1}
+                    total={sections.length}
+                    D={D}
+                    mode={mode}
+                    study={study}
+                  />
+                ))}
+
+                {/* THROUGHLINE */}
+                <section
+                  id={`pay-throughline-${study.slug}`}
+                  style={{ display: "flex", flexDirection: "column", gap: 28, scrollMarginTop: 80 }}
+                >
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    <Eyebrow index={improvements.length + 2}>{`/ ${String(sections.length).padStart(2, "0")}`}</Eyebrow>
+                    <h2 style={{ fontSize: D.h2, margin: 0, letterSpacing: "-0.025em", fontWeight: 500 }}>
+                      Throughline
+                    </h2>
+                  </div>
+                  <Reveal>
+                    <div
+                      style={{
+                        padding: `${D.sectionY * 0.6}px 0`,
+                        borderTop: "1px solid rgba(255,255,255,0.08)",
+                        borderBottom: "1px solid rgba(255,255,255,0.08)",
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: D.h2 * 0.85,
+                          lineHeight: 1.2,
+                          letterSpacing: "-0.02em",
+                          fontWeight: 400,
+                          fontStyle: "italic",
+                          color: "var(--fg)",
+                        }}
+                      >
+                        <span style={{ color: "var(--accent)", marginRight: 8 }}>"</span>
+                        {study.pull}
+                      </div>
+                    </div>
+                  </Reveal>
+                  {mode === "full" && (
+                    <p style={textP()}>
+                      Same approach in both. Look for places where the interface is asking the user to do work the software could do instead, and fix them. Iterative work like this is where the product starts to feel like it's actually on the user's side.
+                    </p>
+                  )}
+                </section>
+
+                {/* OUTCOMES */}
+                <section
+                  id={`pay-outcomes-${study.slug}`}
+                  style={{ display: "flex", flexDirection: "column", gap: 28, scrollMarginTop: 80 }}
+                >
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    <Eyebrow index={improvements.length + 3}>{`/ ${String(sections.length).padStart(2, "0")}`}</Eyebrow>
+                    <h2 style={{ fontSize: D.h2, margin: 0, letterSpacing: "-0.025em", fontWeight: 500 }}>
+                      Outcomes
+                    </h2>
+                  </div>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(2, 1fr)",
+                      gap: 48,
+                      padding: "32px 0",
+                      borderTop: "1px solid rgba(255,255,255,0.08)",
+                      borderBottom: "1px solid rgba(255,255,255,0.08)",
+                    }}
+                  >
+                    {study.metrics.map((m, i) => (
+                      <Reveal key={m.label} delay={i * 80}>
+                        <Stat value={m.value} label={m.label} note={m.note} size="lg" accent={i === 0} />
+                      </Reveal>
+                    ))}
+                  </div>
+                </section>
+
+                <div style={{ marginTop: D.sectionY }}>
+                  <NextCaseStudy next={next} density={density} />
+                </div>
+              </main>
+            </div>
+
+            <SiteFooter maxWidth={1240} />
+          </article>
+        );
+      }
+
+      /* ═══════════════════════════════════════════════════════════════════════
+         APP + MOUNT
+         ═══════════════════════════════════════════════════════════════════════ */
+      const slug = new URLSearchParams(window.location.search).get("study") || "collaborative";
+      const study = CASE_STUDIES[slug] || CASE_STUDIES.collaborative;
+
+      function App() {
+        const [mode, setMode] = useState("full");
+
+        useEffect(() => {
+          document.title = `Jay Arnold · ${study.title}`;
+        }, []);
+
+        if (study.layout === "payments") {
+          return (
+            <CasePayments
+              study={study}
+              all={CASE_STUDIES}
+              mode={mode}
+              setMode={setMode}
+            />
+          );
+        }
+        return (
+          <CaseEditorial
+            study={study}
+            all={CASE_STUDIES}
+            mode={mode}
+            setMode={setMode}
+          />
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Jay Arnold · About</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg: #080a0d;
+        --fg: #eef1f6;
+        --accent: #00f5d4;
+        --sans: "Geist", "Helvetica Neue", system-ui, sans-serif;
+        --mono: "Geist Mono", "JetBrains Mono", ui-monospace, monospace;
+        --t-fast: 180ms cubic-bezier(.2,.7,.2,1);
+        --t-med: 320ms cubic-bezier(.2,.7,.2,1);
+      }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+        font-family: var(--sans);
+        color: var(--fg);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      ::selection {
+        background: var(--accent);
+        color: #0a0a0a;
+      }
+      a:hover { color: var(--accent); }
+    </style>
+
+    <script
+      src="https://unpkg.com/react@18.3.1/umd/react.development.js"
+      integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"
+      integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"
+      integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useEffect, useRef, useState } = React;
+
+      /* ───────────────────────────────────────────────────────────────────
+         Reveal — fades + translates in on intersection
+         ─────────────────────────────────────────────────────────────────── */
+      function Reveal({ children, delay = 0 }) {
+        const ref = useRef(null);
+        const [shown, setShown] = useState(false);
+        useEffect(() => {
+          const el = ref.current;
+          if (!el) return;
+          const obs = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((e) => {
+                if (e.isIntersecting) { setShown(true); obs.unobserve(el); }
+              });
+            },
+            { threshold: 0.12, rootMargin: "0px 0px -8% 0px" }
+          );
+          obs.observe(el);
+          return () => obs.disconnect();
+        }, []);
+        return (
+          <div
+            ref={ref}
+            style={{
+              opacity: shown ? 1 : 0,
+              transform: shown ? "translateY(0)" : "translateY(16px)",
+              transition: `opacity 700ms cubic-bezier(.2,.7,.2,1) ${delay}ms, transform 700ms cubic-bezier(.2,.7,.2,1) ${delay}ms`,
+            }}
+          >
+            {children}
+          </div>
+        );
+      }
+
+      /* ───────────────────────────────────────────────────────────────────
+         Eyebrow — monospace label, optionally accent-colored
+         ─────────────────────────────────────────────────────────────────── */
+      function Eyebrow({ children, accent, index }) {
+        const color = accent ? "var(--accent)" : "rgba(255,255,255,0.45)";
+        return (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: index != null ? 10 : undefined,
+              fontFamily: "var(--mono)",
+              fontSize: 11,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color,
+            }}
+          >
+            {index != null && (
+              <span style={{ color: "var(--accent)" }}>
+                {String(index).padStart(2, "0")}
+              </span>
+            )}
+            {children}
+          </div>
+        );
+      }
+
+      /* ───────────────────────────────────────────────────────────────────
+         ContactLinks — full list style (for contact column)
+         ─────────────────────────────────────────────────────────────────── */
+      function ContactLinks() {
+        const items = [
+          {
+            label: "Email",
+            display: "jaymillerarnold@gmail.com",
+            href: "mailto:jaymillerarnold@gmail.com",
+            props: {},
+          },
+          {
+            label: "Resume",
+            display: "Jay_Arnold_Resume.pdf",
+            href: "Jay_Arnold_Resume.pdf",
+            props: { download: true },
+          },
+          {
+            label: "LinkedIn",
+            display: "in/jay-m-arnold",
+            href: "https://www.linkedin.com/in/jay-m-arnold/",
+            props: { target: "_blank", rel: "noopener noreferrer" },
+          },
+        ];
+        return (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 14,
+              fontFamily: "var(--mono)",
+              fontSize: 12,
+              letterSpacing: "0.04em",
+              color: "rgba(255,255,255,0.55)",
+            }}
+          >
+            {items.map(({ label, display, href, props }) => (
+              <a
+                key={label}
+                href={href}
+                {...(props.download ? { download: "" } : {})}
+                {...(props.target ? { target: props.target, rel: props.rel } : {})}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  paddingBlock: 10,
+                  borderBottom: "1px solid rgba(255,255,255,0.06)",
+                  color: "inherit",
+                  textDecoration: "none",
+                }}
+              >
+                <span style={{ color: "rgba(255,255,255,0.85)" }}>{label}</span>
+                <span>{display} ↗</span>
+              </a>
+            ))}
+          </div>
+        );
+      }
+
+      /* ───────────────────────────────────────────────────────────────────
+         ContactLinksCompact — inline Email / Resume / LinkedIn for footer
+         ─────────────────────────────────────────────────────────────────── */
+      function ContactLinksCompact() {
+        const items = [
+          { label: "Email", href: "mailto:jaymillerarnold@gmail.com", props: {} },
+          { label: "Resume", href: "Jay_Arnold_Resume.pdf", props: { download: true } },
+          { label: "LinkedIn", href: "https://www.linkedin.com/in/jay-m-arnold/", props: { target: "_blank", rel: "noopener noreferrer" } },
+        ];
+        return (
+          <div
+            style={{
+              display: "flex",
+              gap: 28,
+              flexWrap: "wrap",
+              fontFamily: "var(--mono)",
+              fontSize: 11,
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+              color: "rgba(255,255,255,0.55)",
+            }}
+          >
+            {items.map(({ label, href, props }) => (
+              <a
+                key={label}
+                href={href}
+                {...(props.download ? { download: "" } : {})}
+                {...(props.target ? { target: props.target, rel: props.rel } : {})}
+                style={{ color: "inherit", textDecoration: "none" }}
+              >
+                {label} ↗
+              </a>
+            ))}
+          </div>
+        );
+      }
+
+      /* ───────────────────────────────────────────────────────────────────
+         SiteFooter — shared footer
+         ─────────────────────────────────────────────────────────────────── */
+      function SiteFooter({ maxWidth = 1400 }) {
+        return (
+          <footer
+            style={{
+              maxWidth,
+              margin: "0 auto",
+              padding: "32px 32px 48px",
+              borderTop: "1px solid rgba(255,255,255,0.08)",
+              display: "flex",
+              flexDirection: "column",
+              gap: 16,
+            }}
+          >
+            <div
+              style={{
+                marginTop: 40,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: 24,
+                flexWrap: "wrap",
+                fontFamily: "var(--mono)",
+                fontSize: 11,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "rgba(255,255,255,0.55)",
+              }}
+            >
+              <span>© 2026 Jay Arnold · Durango, CO</span>
+              <ContactLinksCompact />
+            </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: 24,
+                flexWrap: "wrap",
+                fontFamily: "var(--mono)",
+                fontSize: 10,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: "rgba(255,255,255,0.32)",
+              }}
+            >
+              <span>Geist + Geist Mono</span>
+              <span>Designed in Figma · Built in Claude Code</span>
+            </div>
+          </footer>
+        );
+      }
+
+      /* ───────────────────────────────────────────────────────────────────
+         PortfolioChrome — sticky top nav
+         ─────────────────────────────────────────────────────────────────── */
+      function PortfolioChrome({ current }) {
+        return (
+          <header
+            style={{
+              position: "sticky",
+              top: 0,
+              zIndex: 50,
+              background: "color-mix(in oklab, var(--bg) 80%, transparent)",
+              backdropFilter: "blur(12px)",
+              borderBottom: "1px solid rgba(255,255,255,0.06)",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "14px 32px",
+                fontFamily: "var(--mono)",
+                fontSize: 11,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
+                <a
+                  href="index.html"
+                  style={{
+                    color: "var(--fg)",
+                    textDecoration: "none",
+                    fontWeight: 600,
+                    fontFamily: "var(--sans)",
+                    fontSize: 14,
+                    letterSpacing: "-0.01em",
+                    textTransform: "none",
+                  }}
+                >
+                  Jay Arnold
+                </a>
+                <nav
+                  style={{
+                    display: "flex",
+                    gap: 28,
+                    fontFamily: "var(--sans)",
+                    fontSize: 14,
+                    letterSpacing: "-0.01em",
+                    textTransform: "none",
+                  }}
+                >
+                  <a
+                    href="index.html"
+                    style={{
+                      color: current === "work" ? "var(--fg)" : "rgba(255,255,255,0.55)",
+                      textDecoration: "none",
+                      fontWeight: current === "work" ? 500 : 400,
+                    }}
+                  >
+                    Work
+                  </a>
+                  <a
+                    href="about.html"
+                    style={{
+                      color: current === "about" ? "var(--fg)" : "rgba(255,255,255,0.55)",
+                      textDecoration: "none",
+                      fontWeight: current === "about" ? 500 : 400,
+                    }}
+                  >
+                    About
+                  </a>
+                </nav>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--accent)" }}>
+                <span
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: 999,
+                    background: "var(--accent)",
+                    boxShadow: "0 0 8px var(--accent)",
+                    display: "inline-block",
+                    flexShrink: 0,
+                  }}
+                />
+                Available for work
+              </div>
+            </div>
+          </header>
+        );
+      }
+
+      /* ───────────────────────────────────────────────────────────────────
+         About — main page
+         ─────────────────────────────────────────────────────────────────── */
+      function About() {
+        return (
+          <main
+            style={{
+              background: "var(--bg)",
+              minHeight: "100vh",
+            }}
+          >
+            <PortfolioChrome current="about" />
+
+            <section
+              style={{
+                maxWidth: 1400,
+                margin: "0 auto",
+                padding: "120px 32px 80px",
+              }}
+            >
+              <Eyebrow accent>About</Eyebrow>
+
+              <div
+                style={{
+                  marginTop: 56,
+                  display: "grid",
+                  gridTemplateColumns: "1.4fr 1fr",
+                  gap: 80,
+                  alignItems: "start",
+                }}
+              >
+                <Reveal delay={120}>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 28,
+                      fontSize: 22,
+                      lineHeight: 1.5,
+                      letterSpacing: "-0.005em",
+                      color: "rgba(255,255,255,0.78)",
+                      maxWidth: "44ch",
+                      fontWeight: 400,
+                    }}
+                  >
+                    <p style={{ margin: 0 }}>
+                      I'm a lead product designer. I focus on 0-to-1 work and on
+                      taking complex, ambiguous problems and turning them into
+                      experiences that hold up when they meet real users.
+                    </p>
+                    <p style={{ margin: 0 }}>
+                      I care about the full loop. Discovery, design, validation, and
+                      what happens after it ships. The best design decisions I've
+                      made came from watching someone use a product and being honest
+                      about what I saw.
+                    </p>
+                    <p style={{ margin: 0, color: "rgba(255,255,255,0.55)" }}>
+                      Currently based in Durango, CO. Open to senior and lead roles
+                      in product design.
+                    </p>
+                  </div>
+                </Reveal>
+
+                <Reveal delay={200}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+                    <Eyebrow>Contact</Eyebrow>
+                    <ContactLinks />
+                  </div>
+                </Reveal>
+              </div>
+
+              <Reveal delay={280}>
+                <div
+                  style={{
+                    marginTop: 120,
+                    paddingTop: 28,
+                    borderTop: "1px solid rgba(255,255,255,0.08)",
+                    display: "grid",
+                    gridTemplateColumns: "repeat(4, 1fr)",
+                    gap: 32,
+                  }}
+                >
+                  {[
+                    ["0 → 1", "Specialty"],
+                    ["Research-led", "Approach"],
+                    ["Fintech / CRE", "Domain"],
+                    ["Durango, CO", "Based"],
+                  ].map(([value, label], i) => (
+                    <div
+                      key={i}
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 14,
+                        paddingLeft: i === 0 ? 0 : 24,
+                        borderLeft: i === 0 ? "none" : "1px solid rgba(255,255,255,0.06)",
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontFamily: "var(--mono)",
+                          fontSize: 11,
+                          letterSpacing: "0.12em",
+                          textTransform: "uppercase",
+                          color: "rgba(255,255,255,0.4)",
+                        }}
+                      >
+                        {label}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: 22,
+                          lineHeight: 1.15,
+                          letterSpacing: "-0.015em",
+                          fontWeight: 500,
+                          color: "var(--fg)",
+                          fontFeatureSettings: '"tnum" 1, "ss01" 1',
+                        }}
+                      >
+                        {value}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Reveal>
+            </section>
+
+            <SiteFooter maxWidth={1400} />
+          </main>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById("root")).render(<About />);
+    </script>
+  </body>
+</html>
