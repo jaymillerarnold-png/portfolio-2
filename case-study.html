@@ -62,6 +62,16 @@
     <script type="text/babel">
       const { useState, useEffect, useRef } = React;
 
+      function useIsMobile(bp = 768) {
+        const [m, setM] = useState(window.innerWidth < bp);
+        useEffect(() => {
+          const h = () => setM(window.innerWidth < bp);
+          window.addEventListener('resize', h);
+          return () => window.removeEventListener('resize', h);
+        }, [bp]);
+        return m;
+      }
+
       /* ═══════════════════════════════════════════════════════════════════════
          CONTENT DATA
          ═══════════════════════════════════════════════════════════════════════ */
@@ -554,6 +564,7 @@
 
       /* PortfolioChrome */
       function PortfolioChrome({ current }) {
+        const isMobile = useIsMobile();
         return (
           <header
             style={{
@@ -570,14 +581,14 @@
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                padding: "14px 32px",
+                padding: isMobile ? "14px 20px" : "14px 32px",
                 fontFamily: "var(--mono)",
                 fontSize: 11,
                 letterSpacing: "0.1em",
                 textTransform: "uppercase",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 20 : 28 }}>
                 <a
                   href="index.html"
                   style={{
@@ -635,7 +646,7 @@
                     boxShadow: "0 0 8px var(--accent)",
                   }}
                 />
-                Available for work
+                {!isMobile && "Available for work"}
               </div>
             </div>
           </header>
@@ -781,12 +792,13 @@
 
       /* SiteFooter */
       function SiteFooter({ maxWidth = 1400 }) {
+        const isMobile = useIsMobile();
         return (
           <footer
             style={{
               maxWidth,
               margin: "0 auto",
-              padding: "32px 32px 48px",
+              padding: isMobile ? "24px 20px 40px" : "32px 32px 48px",
               borderTop: "1px solid rgba(255,255,255,0.08)",
               display: "flex",
               flexDirection: "column",
@@ -862,18 +874,19 @@
          ═══════════════════════════════════════════════════════════════════════ */
 
       function HeroAE({ study, D }) {
+        const isMobile = useIsMobile();
         return (
           <section
             style={{
               maxWidth: 1240,
               margin: "0 auto",
-              padding: `${D.heroY}px ${D.padX}px ${D.heroY * 0.5}px`,
+              padding: isMobile ? `56px 20px 32px` : `${D.heroY}px ${D.padX}px ${D.heroY * 0.5}px`,
             }}
           >
             <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
               <h1
                 style={{
-                  fontSize: D.h1,
+                  fontSize: isMobile ? "clamp(36px, 9vw, 56px)" : D.h1,
                   lineHeight: 1.0,
                   letterSpacing: "-0.035em",
                   margin: 0,
@@ -902,9 +915,9 @@
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(4, 1fr)",
-                gap: 24,
-                marginTop: D.sectionY,
+                gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(4, 1fr)",
+                gap: isMobile ? 20 : 24,
+                marginTop: isMobile ? 32 : D.sectionY,
                 paddingTop: 32,
                 borderTop: "1px solid rgba(255,255,255,0.1)",
               }}
@@ -959,6 +972,7 @@
       }
 
       function CaseEditorial({ study, all, mode, setMode, density = "compact" }) {
+        const isMobile = useIsMobile();
         const D = densityScale(density);
         const H = study.headers || {};
         const sections = [
@@ -994,15 +1008,15 @@
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "200px 1fr",
+                gridTemplateColumns: isMobile ? "1fr" : "200px 1fr",
                 gap: D.gap,
                 maxWidth: 1240,
                 margin: "0 auto",
-                padding: `0 ${D.padX}px`,
+                padding: isMobile ? "0 20px" : `0 ${D.padX}px`,
               }}
             >
               {/* Sticky nav */}
-              <aside style={{ position: "sticky", top: 80, alignSelf: "start", paddingTop: D.sectionY }}>
+              <aside style={{ display: isMobile ? "none" : undefined, position: "sticky", top: 80, alignSelf: "start", paddingTop: D.sectionY }}>
                 <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                   <div style={{ marginBottom: 8 }}>
                     <ViewToggle value={mode} onChange={setMode} density={density} />
@@ -1068,7 +1082,7 @@
                         <div
                           style={{
                             display: "grid",
-                            gridTemplateColumns: "repeat(4, 1fr)",
+                            gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(4, 1fr)",
                             gap: 24,
                             padding: "28px 0",
                             borderTop: "1px solid rgba(255,255,255,0.08)",
@@ -1098,8 +1112,8 @@
                         <div
                           style={{
                             display: "grid",
-                            gridTemplateColumns: "120px 1fr",
-                            gap: 24,
+                            gridTemplateColumns: isMobile ? "1fr" : "120px 1fr",
+                            gap: isMobile ? 8 : 24,
                             padding: "28px 0",
                             borderTop: i === 0 ? "1px solid rgba(255,255,255,0.08)" : "none",
                             borderBottom: "1px solid rgba(255,255,255,0.08)",
@@ -1205,8 +1219,8 @@
                   <div
                     style={{
                       display: "grid",
-                      gridTemplateColumns: "repeat(2, 1fr)",
-                      gap: 48,
+                      gridTemplateColumns: isMobile ? "1fr" : "repeat(2, 1fr)",
+                      gap: isMobile ? 32 : 48,
                       padding: "32px 0",
                       borderTop: "1px solid rgba(255,255,255,0.08)",
                       borderBottom: "1px solid rgba(255,255,255,0.08)",
@@ -1358,6 +1372,7 @@
       }
 
       function ImprovementBlock({ imp, index, total, D, mode, study }) {
+        const isMobile = useIsMobile();
         const [view, setView] = useState("after");
 
         return (
@@ -1392,7 +1407,7 @@
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
+                  gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
                   gap: 0,
                   borderTop: "1px solid rgba(255,255,255,0.08)",
                   borderBottom: "1px solid rgba(255,255,255,0.08)",
@@ -1402,9 +1417,10 @@
                   <div
                     key={label}
                     style={{
-                      padding: "28px 28px 28px 0",
-                      paddingLeft: i === 0 ? 0 : 28,
-                      borderLeft: i === 0 ? "none" : "1px solid rgba(255,255,255,0.06)",
+                      padding: isMobile ? "20px 0" : "28px 28px 28px 0",
+                      paddingLeft: (!isMobile && i !== 0) ? 28 : 0,
+                      borderLeft: (!isMobile && i !== 0) ? "1px solid rgba(255,255,255,0.06)" : "none",
+                      borderTop: (isMobile && i !== 0) ? "1px solid rgba(255,255,255,0.06)" : "none",
                       display: "flex",
                       flexDirection: "column",
                       gap: 14,
@@ -1460,18 +1476,19 @@
       }
 
       function HeroP({ study, D, improvements }) {
+        const isMobile = useIsMobile();
         return (
           <section
             style={{
               maxWidth: 1240,
               margin: "0 auto",
-              padding: `${D.heroY}px ${D.padX}px ${D.heroY * 0.5}px`,
+              padding: isMobile ? "56px 20px 32px" : `${D.heroY}px ${D.padX}px ${D.heroY * 0.5}px`,
             }}
           >
             <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
               <h1
                 style={{
-                  fontSize: D.h1,
+                  fontSize: isMobile ? "clamp(36px, 9vw, 56px)" : D.h1,
                   lineHeight: 1.0,
                   letterSpacing: "-0.035em",
                   margin: 0,
@@ -1491,9 +1508,9 @@
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(4, 1fr)",
-                gap: 24,
-                marginTop: D.sectionY,
+                gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(4, 1fr)",
+                gap: isMobile ? 20 : 24,
+                marginTop: isMobile ? 32 : D.sectionY,
                 paddingTop: 32,
                 borderTop: "1px solid rgba(255,255,255,0.1)",
               }}
@@ -1525,6 +1542,7 @@
       }
 
       function CasePayments({ study, all, mode, setMode, density = "compact" }) {
+        const isMobile = useIsMobile();
         const D = densityScale(density);
         const improvements = study.improvements || [];
         const sections = [
@@ -1559,15 +1577,15 @@
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "200px 1fr",
+                gridTemplateColumns: isMobile ? "1fr" : "200px 1fr",
                 gap: D.gap,
                 maxWidth: 1240,
                 margin: "0 auto",
-                padding: `0 ${D.padX}px`,
+                padding: isMobile ? "0 20px" : `0 ${D.padX}px`,
               }}
             >
               {/* Sticky nav */}
-              <aside style={{ position: "sticky", top: 80, alignSelf: "start", paddingTop: D.sectionY }}>
+              <aside style={{ display: isMobile ? "none" : undefined, position: "sticky", top: 80, alignSelf: "start", paddingTop: D.sectionY }}>
                 <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                   <div style={{ marginBottom: 8 }}>
                     <ViewToggle value={mode} onChange={setMode} density={density} />
@@ -1701,8 +1719,8 @@
                   <div
                     style={{
                       display: "grid",
-                      gridTemplateColumns: "repeat(2, 1fr)",
-                      gap: 48,
+                      gridTemplateColumns: isMobile ? "1fr" : "repeat(2, 1fr)",
+                      gap: isMobile ? 32 : 48,
                       padding: "32px 0",
                       borderTop: "1px solid rgba(255,255,255,0.08)",
                       borderBottom: "1px solid rgba(255,255,255,0.08)",
